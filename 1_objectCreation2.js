@@ -74,11 +74,23 @@ class Person {
   
   var object = new Person("Lalit");
 
-  // 8. Singleton Pattern
-  class Person {
-    constructor(name) {
-      this.name = name;
+// 8. Singleton Pattern
+class Person {
+  constructor(name) {
+    // Return existing instance if already created
+    if (Person.instance) {
+      return Person.instance;
     }
+
+    // Otherwise create new instance
+    this.name = name;
+    Person.instance = this;
   }
-  
-  var object = new Person("Lalit");
+}
+
+const a = new Person("Lalit");
+const b = new Person("Karuna");
+
+console.log(a === b); // ✅ true
+console.log(a.name);  // "Lalit"
+console.log(b.name);  // still "Lalit" (singleton preserves first)

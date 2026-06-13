@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The JavaScript Evolution — ES3 to ES2026</title>
+<script>try{if(matchMedia('(prefers-color-scheme: light)').matches)document.documentElement.setAttribute('data-theme','light');else document.documentElement.setAttribute('data-theme','dark');}catch(e){document.documentElement.setAttribute('data-theme','dark');}</script>
+<style>
+  :root{
+    --bg:#0d0e12; --bg2:#0a0b0e; --panel:#14161d; --panel2:#1a1d27;
+    --line:#262b38; --line2:#323848;
+    --ink:#e9ebf2; --mut:#9aa1b4; --faint:#6a7184;
+    --js:#f7df1e; --js-dim:rgba(247,223,30,.12); --js-line:rgba(247,223,30,.4);
+    --t-key:#c792ea; --t-str:#c3e88d; --t-num:#f78c6c; --t-com:#5b6171;
+    --t-fn:#82aaff; --t-type:#ffcb6b; --t-lit:#ff6b81; --t-pun:#9aa1b4;
+    --err:#ff6b81; --warn:#ffcb6b; --ok:#c3e88d;
+    --accent-text:var(--js); --rail-bg:rgba(13,14,18,.86);
+    --out-bg:#0b0c10; --out-line:rgba(255,255,255,.03);
+    --mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,Consolas,'Liberation Mono',monospace;
+    --disp:'Space Grotesk',ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+    --body:'Inter',ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  }
+  html[data-theme="light"]{
+    --bg:#f7f6f2; --bg2:#efeee7; --panel:#ffffff; --panel2:#f3f2ec;
+    --line:#e6e4dc; --line2:#d6d3c8;
+    --ink:#1b1d23; --mut:#565b69; --faint:#8a8e9b;
+    --js:#f7df1e; --accent-text:#9a6b00;
+    --js-dim:rgba(154,107,0,.10); --js-line:rgba(154,107,0,.35);
+    --t-key:#d01040; --t-str:#1a7f37; --t-num:#0550ae; --t-com:#7d8590;
+    --t-fn:#6639ba; --t-type:#bc4b00; --t-lit:#0550ae; --t-pun:#57606a;
+    --err:#cf222e; --warn:#9a6700; --ok:#1a7f37;
+    --rail-bg:rgba(247,246,242,.85); --out-bg:#f4f3ed; --out-line:rgba(0,0,0,.05);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;background:
+      radial-gradient(1200px 600px at 85% -10%,rgba(247,223,30,.05),transparent 60%),
+      var(--bg);
+    color:var(--ink);font-family:var(--body);line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit}
+  body,header,aside,.rail-wrap,.card,.out,.editor pre,main{transition:background-color .25s ease,border-color .25s ease}
+
+  /* ---------- Header / hero ---------- */
+  header{
+    border-bottom:1px solid var(--line);
+    padding:46px clamp(18px,5vw,64px) 30px;
+    background:linear-gradient(180deg,var(--bg2),transparent);
+    position:relative;overflow:hidden;
+  }
+  .eyebrow{
+    font-family:var(--mono);font-size:12px;letter-spacing:.34em;text-transform:uppercase;
+    color:var(--accent-text);margin:0 0 14px;display:flex;align-items:center;gap:12px;
+  }
+  .eyebrow::before{content:"";width:30px;height:1px;background:var(--js-line)}
+  h1{
+    font-family:var(--disp);font-weight:700;font-size:clamp(34px,6.2vw,68px);
+    line-height:.98;margin:0;letter-spacing:-.02em;
+  }
+  h1 .y{color:var(--accent-text)}
+  .lede{
+    max-width:620px;margin:18px 0 0;color:var(--mut);font-size:clamp(15px,1.7vw,18px);
+  }
+  .lede code{font-family:var(--mono);color:var(--ink);background:var(--panel);
+    padding:1px 6px;border-radius:5px;font-size:.88em;border:1px solid var(--line)}
+  .legend{
+    margin-top:22px;display:flex;flex-wrap:wrap;gap:8px 18px;color:var(--faint);
+    font-size:13px;font-family:var(--mono);
+  }
+  .legend b{color:var(--accent-text);font-weight:500}
+  kbd{font-family:var(--mono);font-size:11px;background:var(--panel2);border:1px solid var(--line2);
+    border-bottom-width:2px;border-radius:5px;padding:1px 6px;color:var(--ink)}
+
+  /* ---------- Timeline rail ---------- */
+  .rail-wrap{position:sticky;top:0;z-index:40;background:var(--rail-bg);
+    backdrop-filter:blur(10px);border-bottom:1px solid var(--line);display:flex;align-items:stretch}
+  .rail{flex:1;min-width:0;display:flex;gap:0;overflow-x:auto;padding:0 clamp(12px,4vw,40px);
+    scrollbar-width:thin;scrollbar-color:var(--line2) transparent}
+  .rail::-webkit-scrollbar{height:6px}
+  .rail::-webkit-scrollbar-thumb{background:var(--line2);border-radius:3px}
+  .tick{
+    flex:0 0 auto;border:0;background:transparent;cursor:pointer;color:var(--faint);
+    font-family:var(--mono);padding:13px 15px 12px;position:relative;white-space:nowrap;
+    transition:color .18s;border-bottom:2px solid transparent;
+  }
+  .tick .yr{font-size:15px;font-weight:700;color:inherit;display:block}
+  .tick .ed{font-size:10.5px;letter-spacing:.06em;color:var(--faint);text-transform:uppercase}
+  .tick:hover{color:var(--mut)}
+  .tick.active{color:var(--accent-text);border-bottom-color:var(--accent-text)}
+  .tick.active .ed{color:var(--mut)}
+
+  /* ---------- Layout ---------- */
+  .shell{display:grid;grid-template-columns:236px 1fr;gap:0;
+    max-width:1320px;margin:0 auto}
+  aside{
+    border-right:1px solid var(--line);padding:26px 14px 60px;
+    position:sticky;top:50px;align-self:start;max-height:calc(100vh - 50px);overflow-y:auto;
+    scrollbar-width:thin;scrollbar-color:var(--line2) transparent;
+  }
+  aside h2{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--faint);margin:0 0 12px 12px}
+  .nav-item{
+    display:block;width:100%;text-align:left;border:0;background:transparent;cursor:pointer;
+    color:var(--mut);font-family:var(--body);font-size:14px;padding:8px 12px;border-radius:8px;
+    position:relative;transition:background .15s,color .15s;line-height:1.3;
+  }
+  .nav-item .nyr{font-family:var(--mono);font-size:11px;color:var(--faint);display:block}
+  .nav-item:hover{background:var(--panel);color:var(--ink)}
+  .nav-item.active{background:var(--js-dim);color:var(--ink)}
+  .nav-item.active::before{content:"";position:absolute;left:0;top:8px;bottom:8px;width:3px;
+    background:var(--accent-text);border-radius:2px}
+  .nav-item.active .nyr{color:var(--accent-text)}
+
+  main{padding:30px clamp(16px,4vw,48px) 90px;min-width:0}
+
+  /* ---------- Era header ---------- */
+  .era-head{margin-bottom:26px}
+  .era-head .meta{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+  .era-head .big-yr{font-family:var(--disp);font-weight:700;font-size:clamp(40px,8vw,76px);
+    line-height:.9;letter-spacing:-.03em;color:var(--accent-text)}
+  .era-head .edition{font-family:var(--mono);font-size:14px;color:var(--mut);
+    border:1px solid var(--line);padding:5px 11px;border-radius:999px}
+  .era-head .name{font-family:var(--disp);font-weight:500;font-size:clamp(20px,3vw,30px);
+    margin:6px 0 0;letter-spacing:-.01em}
+  .era-head .blurb{color:var(--mut);max-width:680px;margin:10px 0 0;font-size:15px}
+  .era-actions{margin-top:16px;display:flex;gap:10px;flex-wrap:wrap}
+
+  /* ---------- Feature cards ---------- */
+  .card{border:1px solid var(--line);border-radius:14px;background:var(--panel);
+    margin-bottom:18px;overflow:hidden}
+  .card-head{padding:16px 18px 0}
+  .card-head .ft{font-family:var(--disp);font-weight:600;font-size:18px;
+    display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .pill{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+    padding:3px 8px;border-radius:999px;border:1px solid var(--line2);color:var(--faint)}
+  .pill.preview{color:var(--warn);border-color:rgba(255,203,107,.35);background:rgba(255,203,107,.08)}
+  .card-head .desc{color:var(--mut);font-size:14px;margin:7px 0 14px}
+  .note{font-size:12.5px;color:var(--faint);font-family:var(--mono);margin:-6px 18px 14px;
+    padding:8px 12px;border-left:2px solid var(--js-line);background:var(--js-dim);border-radius:0 8px 8px 0}
+
+  /* ---------- Editor ---------- */
+  .editor-bar{display:flex;align-items:center;justify-content:space-between;
+    padding:7px 12px 7px 16px;border-top:1px solid var(--line);background:var(--bg2)}
+  .editor-bar .tag{font-family:var(--mono);font-size:11px;color:var(--faint)}
+  .btns{display:flex;gap:8px}
+  .btn{font-family:var(--mono);font-size:12px;border:1px solid var(--line2);background:var(--panel2);
+    color:var(--mut);padding:5px 12px;border-radius:7px;cursor:pointer;transition:.14s;display:flex;align-items:center;gap:6px}
+  .btn:hover{color:var(--ink);border-color:var(--faint)}
+  .btn.run{background:var(--js);color:#1a1500;border-color:var(--js);font-weight:700}
+  .btn.run:hover{background:#ffe948;color:#1a1500}
+  .btn:focus-visible,.tick:focus-visible,.nav-item:focus-visible{outline:2px solid var(--js);outline-offset:2px}
+
+  .editor{position:relative;font-family:var(--mono);font-size:13.5px;line-height:1.65;tab-size:2}
+  .editor pre,.editor textarea{
+    margin:0;padding:16px 18px;font:inherit;line-height:inherit;
+    white-space:pre;overflow-wrap:normal;word-break:normal;
+    border:0;width:100%;letter-spacing:0;
+  }
+  .editor pre{color:var(--ink);overflow-x:auto;min-height:100%;
+    scrollbar-width:thin;scrollbar-color:var(--line2) transparent}
+  .editor pre::-webkit-scrollbar{height:7px}
+  .editor pre::-webkit-scrollbar-thumb{background:var(--line2);border-radius:4px}
+  .editor textarea{
+    position:absolute;inset:0;background:transparent;color:transparent;caret-color:var(--js);
+    resize:none;overflow:hidden;outline:none;white-space:pre;overflow-x:auto;
+  }
+  .editor textarea::selection{background:rgba(247,223,30,.25)}
+  /* syntax */
+  .t-key{color:var(--t-key)} .t-str{color:var(--t-str)} .t-num{color:var(--t-num)}
+  .t-com{color:var(--t-com);font-style:italic} .t-fn{color:var(--t-fn)} .t-type{color:var(--t-type)}
+  .t-lit{color:var(--t-lit)} .t-pun{color:var(--t-pun)}
+
+  /* ---------- Output ---------- */
+  .out{border-top:1px solid var(--line);background:var(--out-bg);font-family:var(--mono);
+    font-size:12.5px;line-height:1.6;max-height:340px;overflow:auto;display:none;
+    scrollbar-width:thin;scrollbar-color:var(--line2) transparent}
+  .out.show{display:block}
+  .out-row{padding:5px 16px;display:flex;gap:10px;border-bottom:1px solid var(--out-line);white-space:pre-wrap;word-break:break-word}
+  .out-row .gut{color:var(--line2);user-select:none;flex:0 0 auto}
+  .out-row.log .gut{color:var(--accent-text)}
+  .out-row.error{color:var(--err)} .out-row.error .gut{color:var(--err)}
+  .out-row.warn{color:var(--warn)} .out-row.warn .gut{color:var(--warn)}
+  .out-row.empty{color:var(--faint)}
+  .out-row.meta{color:var(--faint);font-style:italic}
+
+  .theme-toggle{flex:0 0 auto;border:0;border-left:1px solid var(--line);background:transparent;
+    color:var(--mut);cursor:pointer;font-family:var(--mono);font-size:12px;letter-spacing:.04em;
+    padding:0 18px;display:flex;align-items:center;gap:8px;transition:color .15s}
+  .theme-toggle:hover{color:var(--accent-text)}
+  .theme-toggle svg{width:15px;height:15px;flex:0 0 auto}
+  .theme-toggle:focus-visible{outline:2px solid var(--js);outline-offset:-2px}
+  @media (max-width:520px){.theme-toggle span{display:none}.theme-toggle{padding:0 14px}}
+  footer{border-top:1px solid var(--line);padding:34px clamp(18px,5vw,64px);
+    color:var(--faint);font-size:13px;max-width:1320px;margin:0 auto}
+  footer a{color:var(--mut);text-decoration:underline;text-underline-offset:2px}
+  .fade{animation:fade .32s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  @media (max-width:860px){
+    .shell{grid-template-columns:1fr}
+    aside{display:none}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{scroll-behavior:auto;transition:none!important}.fade{animation:none}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <p class="eyebrow">A live, editable history of a language</p>
+  <h1>The JavaScript<br>Evolution<span class="y">.</span></h1>
+  <p class="lede">Every feature below is the real thing — it runs in your browser right now.
+    Edit any snippet and press <kbd>Run</kbd>. Walk the language from <code>try/catch</code> in
+    1999 all the way to <code>Temporal</code> in 2026.</p>
+  <div class="legend">
+    <span><b>14</b> editions</span>
+    <span><b>27</b> years</span>
+    <span><b>40+</b> runnable features</span>
+    <span>Tip: <kbd>Ctrl</kbd>/<kbd>⌘</kbd> + <kbd>Enter</kbd> runs the focused editor</span>
+  </div>
+</header>
+
+<div class="rail-wrap">
+  <nav class="rail" id="rail" aria-label="Timeline"></nav>
+  <button id="themeToggle" class="theme-toggle" type="button" aria-label="Toggle light and dark theme"></button>
+</div>
+
+<div class="shell">
+  <aside><h2>Editions</h2><div id="nav"></div></aside>
+  <main id="main"></main>
+</div>
+
+<footer>
+  Built as a single, dependency-free HTML file — the irony of a JavaScript history with no framework is intentional.
+  Bleeding-edge ES2026 features (<code style="font-family:var(--mono)">Temporal</code>, <code style="font-family:var(--mono)">Math.sumPrecise</code>, byte/base64 helpers) feature-detect at
+  runtime and explain themselves if your browser hasn't shipped them yet.
+  ES2026 is the 17th edition, finalized in the 2025–26 TC39 cycle.
+</footer>
+
+<script>
+/* ============================================================
+   DATA — eras and their features (code lives in #codebank)
+   ============================================================ */
+const ERAS = [
+  { id:"es3", yr:"1999", ed:"ES1–ES3", name:"The Foundations",
+    blurb:"The first decade settled the basics every later feature builds on: structured error handling and a real regular-expression engine.",
+    features:[
+      {ft:"try / catch / finally", code:"es3-try", desc:"Structured error handling, with a finally block that always runs."},
+      {ft:"Regular expressions", code:"es3-regex", desc:"Literal regex syntax with capture groups, flags, exec, and test."},
+    ]},
+  { id:"es5", yr:"2009", ed:"ES5", name:"The Cleanup",
+    blurb:"After the abandoned ES4, ES5 modernized the standard library: functional array methods, native JSON, property descriptors, and strict mode.",
+    features:[
+      {ft:"Array iteration methods", code:"es5-array", desc:"map, filter, reduce, forEach, every, indexOf — the functional toolkit, plus 'use strict'."},
+      {ft:"Native JSON", code:"es5-json", desc:"JSON.stringify and JSON.parse, finally built into the language."},
+      {ft:"Getters, setters & descriptors", code:"es5-define", desc:"Object.defineProperty with accessor functions and fine-grained control."},
+      {ft:"Function.prototype.bind", code:"es5-bind", desc:"Lock a function's `this` and create a reusable bound copy."},
+    ]},
+  { id:"es2015", yr:"2015", ed:"ES2015 · ES6", name:"The Renaissance",
+    blurb:"The largest update in the language's history. So much arrived at once that ES6 effectively split JavaScript into 'before' and 'after'.",
+    features:[
+      {ft:"let & const", code:"es6-let", desc:"Block scoping replaces the foot-guns of var hoisting."},
+      {ft:"Arrow functions", code:"es6-arrow", desc:"Concise functions with a lexical `this`."},
+      {ft:"Template literals", code:"es6-tmpl", desc:"Interpolation with ${} and real multi-line strings."},
+      {ft:"Destructuring", code:"es6-destr", desc:"Pull values out of objects and arrays by shape, with defaults and rest."},
+      {ft:"Default, rest & spread", code:"es6-spread", desc:"Default params, variadic rest, and the spread operator for arrays and objects."},
+      {ft:"Classes", code:"es6-class", desc:"Syntactic sugar over prototypes, with extends and super."},
+      {ft:"Promises", code:"es6-promise", desc:"First-class async with then, Promise.all, and Promise.race."},
+      {ft:"Generators & iterators", code:"es6-gen", desc:"Pausable functions and the Symbol.iterator protocol."},
+      {ft:"Map & Set", code:"es6-mapset", desc:"Real keyed collections and unique-value sets."},
+      {ft:"Symbol", code:"es6-symbol", desc:"Unique, non-colliding keys — the basis of language protocols."},
+      {ft:"Proxy & Reflect", code:"es6-proxy", desc:"Intercept and customize fundamental object operations."},
+      {ft:"Modules", code:"es6-modules", desc:"Standardized import / export. (Needs a module context, so this is a syntax preview.)", illustrative:true},
+    ]},
+  { id:"es2016", yr:"2016", ed:"ES2016", name:"Small but mighty",
+    blurb:"TC39 switched to a yearly cadence. The first annual release was deliberately tiny — just two additions — to prove the process worked.",
+    features:[
+      {ft:"includes() & exponentiation", code:"es2016-misc", desc:"Array.includes (which finds NaN) and the ** operator."},
+    ]},
+  { id:"es2017", yr:"2017", ed:"ES2017", name:"Async arrives",
+    blurb:"async / await turned promise chains into code that reads top-to-bottom — arguably the most loved syntax since arrow functions.",
+    features:[
+      {ft:"async / await", code:"es2017-async", desc:"Write asynchronous code that reads like synchronous code."},
+      {ft:"Object & String helpers", code:"es2017-obj", desc:"Object.entries, Object.values, String.padStart and padEnd."},
+    ]},
+  { id:"es2018", yr:"2018", ed:"ES2018", name:"Spreading out",
+    blurb:"Spread and rest grew to cover objects, regex gained named groups, and promises got a guaranteed cleanup hook.",
+    features:[
+      {ft:"Object spread & rest", code:"es2018-spread", desc:"The {...obj} pattern, now for merging and collecting object properties."},
+      {ft:"Named capture groups", code:"es2018-regex", desc:"Reference regex matches by name instead of numeric index."},
+      {ft:"Promise.finally", code:"es2018-finally", desc:"Run cleanup whether the promise fulfills or rejects."},
+    ]},
+  { id:"es2019", yr:"2019", ed:"ES2019", name:"Flattening",
+    blurb:"Practical array and object reshaping: flatten nested arrays and rebuild objects from key/value pairs.",
+    features:[
+      {ft:"Array flat & flatMap", code:"es2019-flat", desc:"Flatten nested arrays to any depth, or map-then-flatten in one pass."},
+      {ft:"Object.fromEntries", code:"es2019-entries", desc:"The inverse of Object.entries — turn pairs back into an object."},
+      {ft:"trimStart & trimEnd", code:"es2019-trim", desc:"Trim whitespace from one side of a string."},
+    ]},
+  { id:"es2020", yr:"2020", ed:"ES2020", name:"Safer access",
+    blurb:"Optional chaining and nullish coalescing eliminated mountains of defensive boilerplate. BigInt added arbitrary-precision integers.",
+    features:[
+      {ft:"?. and ??", code:"es2020-chain", desc:"Optional chaining and nullish coalescing — safe access, sane defaults."},
+      {ft:"BigInt, globalThis, matchAll", code:"es2020-bigint", desc:"Arbitrary-precision integers, a universal global, and iterable regex matches."},
+    ]},
+  { id:"es2021", yr:"2021", ed:"ES2021", name:"Quality of life",
+    blurb:"Logical assignment operators, readable numeric literals, and string/promise conveniences.",
+    features:[
+      {ft:"Logical assignment", code:"es2021-assign", desc:"??=, ||= and &&= combine a check and an assignment."},
+      {ft:"Separators, replaceAll, any", code:"es2021-misc", desc:"1_000_000, String.replaceAll, and Promise.any."},
+    ]},
+  { id:"es2022", yr:"2022", ed:"ES2022", name:"Class act",
+    blurb:"Classes matured with real private fields, static blocks, and static fields. Plus negative indexing with .at().",
+    features:[
+      {ft:"Class fields & private #", code:"es2022-class", desc:"Public/private instance fields, static fields, and static init blocks."},
+      {ft:"at(), hasOwn, error cause", code:"es2022-misc", desc:"Negative indexing, a safer hasOwnProperty, and error chaining."},
+    ]},
+  { id:"es2023", yr:"2023", ed:"ES2023", name:"Immutable arrays",
+    blurb:"Change-by-copy array methods return new arrays instead of mutating — a perfect fit for state in React and friends.",
+    features:[
+      {ft:"toSorted / toReversed / with", code:"es2023-copy", desc:"Non-mutating versions of sort, reverse, splice, and index assignment."},
+      {ft:"findLast & findLastIndex", code:"es2023-findlast", desc:"Search an array from the end."},
+    ]},
+  { id:"es2024", yr:"2024", ed:"ES2024", name:"Grouping & control",
+    blurb:"Group collections by a key without a utility library, and gain external control over a promise's resolution.",
+    features:[
+      {ft:"Object.groupBy", code:"es2024-group", desc:"Bucket items into an object keyed by a callback's result."},
+      {ft:"Promise.withResolvers", code:"es2024-resolvers", desc:"Get a promise plus its resolve/reject functions in one call."},
+    ]},
+  { id:"es2025", yr:"2025", ed:"ES2025", name:"Iterators & sets",
+    blurb:"Lazy iterator helpers, real set algebra, and small fixes that had been requested for years.",
+    features:[
+      {ft:"Iterator helpers", code:"es2025-iter", desc:"map, filter, take, drop, toArray — lazily, on any iterator."},
+      {ft:"Set methods", code:"es2025-set", desc:"union, intersection, difference, and subset/superset checks."},
+      {ft:"Promise.try", code:"es2025-try", desc:"Start a promise chain from sync code with unified error handling."},
+      {ft:"RegExp.escape", code:"es2025-escape", desc:"Safely escape user input for use inside a RegExp."},
+    ]},
+  { id:"es2026", yr:"2026", ed:"ES2026", name:"Time, finally",
+    blurb:"The latest finalized edition. After roughly nine years in committee, the Temporal API lands — alongside automatic resource cleanup and precise math.",
+    features:[
+      {ft:"Temporal", code:"es2026-temporal", desc:"An immutable, time-zone-aware replacement for the broken Date object."},
+      {ft:"using (explicit resource management)", code:"es2026-using", desc:"Automatic, deterministic cleanup when a scope exits. (Syntax preview — many runtimes don't parse `using` yet.)", illustrative:true},
+      {ft:"…what `using` automates", code:"es2026-dispose", desc:"The Symbol.dispose / try-finally lifecycle that `using` desugars to — runnable today."},
+      {ft:"Math.sumPrecise", code:"es2026-sum", desc:"Sum an array of floats without accumulating rounding error."},
+      {ft:"Error.isError", code:"es2026-iserror", desc:"Reliably detect real Error objects, even across realms."},
+      {ft:"Uint8Array base64 / hex", code:"es2026-base64", desc:"Built-in byte encoding without atob/btoa gymnastics."},
+    ]},
+];
+
+const CODE = {
+  "es3-try": "ZnVuY3Rpb24gZGl2aWRlKGEsIGIpIHsKICB0cnkgewogICAgaWYgKGIgPT09IDApIHRocm93IG5ldyBFcnJvcigiQ2Fubm90IGRpdmlkZSBieSB6ZXJvIik7CiAgICByZXR1cm4gYSAvIGI7CiAgfSBjYXRjaCAoZXJyKSB7CiAgICBjb25zb2xlLmxvZygiQ2F1Z2h0OiIsIGVyci5tZXNzYWdlKTsKICAgIHJldHVybiBudWxsOwogIH0gZmluYWxseSB7CiAgICBjb25zb2xlLmxvZygiYXR0ZW1wdCBmaW5pc2hlZCIpOwogIH0KfQpjb25zb2xlLmxvZygiMTAgLyAyID0iLCBkaXZpZGUoMTAsIDIpKTsKY29uc29sZS5sb2coIjEwIC8gMCA9IiwgZGl2aWRlKDEwLCAwKSk7",
+  "es3-regex": "dmFyIHRleHQgPSAiQ29udGFjdCBhbGljZUBtYWlsLmNvbSBvciBib2JAZGV2LmlvIjsKdmFyIHJlID0gLyhbXHcuXSspQChbXHcuXSspL2c7CnZhciBtOwp3aGlsZSAoKG0gPSByZS5leGVjKHRleHQpKSAhPT0gbnVsbCkgewogIGNvbnNvbGUubG9nKCJ1c2VyOiIsIG1bMV0sICJ8IGRvbWFpbjoiLCBtWzJdKTsKfQpjb25zb2xlLmxvZygidmFsaWQ/IiwgL15cZHszfS1cZHs0fSQvLnRlc3QoIjU1NS0xMjM0IikpOw==",
+  "es5-array": "InVzZSBzdHJpY3QiOwp2YXIgbnVtcyA9IFsxLCAyLCAzLCA0LCA1LCA2XTsKCnZhciBkb3VibGVkRXZlbnMgPSBudW1zCiAgLmZpbHRlcihmdW5jdGlvbiAobikgeyByZXR1cm4gbiAlIDIgPT09IDA7IH0pCiAgLm1hcChmdW5jdGlvbiAobikgeyByZXR1cm4gbiAqIDI7IH0pOwoKdmFyIHRvdGFsID0gbnVtcy5yZWR1Y2UoZnVuY3Rpb24gKHN1bSwgbikgeyByZXR1cm4gc3VtICsgbjsgfSwgMCk7Cgpjb25zb2xlLmxvZygiZG91YmxlZCBldmVuczoiLCBkb3VibGVkRXZlbnMpOwpjb25zb2xlLmxvZygic3VtOiIsIHRvdGFsKTsKY29uc29sZS5sb2coImV2ZXJ5IDwgMTA/IiwgbnVtcy5ldmVyeShmdW5jdGlvbiAobikgeyByZXR1cm4gbiA8IDEwOyB9KSk7CmNvbnNvbGUubG9nKCJpbmRleCBvZiA0OiIsIG51bXMuaW5kZXhPZig0KSk7",
+  "es5-json": "dmFyIHVzZXIgPSB7IG5hbWU6ICJBZGEiLCByb2xlczogWyJhZG1pbiIsICJkZXYiXSwgYWN0aXZlOiB0cnVlIH07Cgp2YXIganNvbiA9IEpTT04uc3RyaW5naWZ5KHVzZXIpOwpjb25zb2xlLmxvZygic2VyaWFsaXplZDoiLCBqc29uKTsKCnZhciBiYWNrID0gSlNPTi5wYXJzZShqc29uKTsKY29uc29sZS5sb2coIm5hbWU6IiwgYmFjay5uYW1lLCAifCByb2xlczoiLCBiYWNrLnJvbGVzLmxlbmd0aCk7Cgpjb25zb2xlLmxvZyhKU09OLnN0cmluZ2lmeSh1c2VyLCBudWxsLCAyKSk7",
+  "es5-define": "dmFyIGFjY291bnQgPSB7IF9iYWxhbmNlOiAxMDAgfTsKCk9iamVjdC5kZWZpbmVQcm9wZXJ0eShhY2NvdW50LCAiYmFsYW5jZSIsIHsKICBnZXQ6IGZ1bmN0aW9uICgpIHsgcmV0dXJuICIkIiArIHRoaXMuX2JhbGFuY2U7IH0sCiAgc2V0OiBmdW5jdGlvbiAodikgeyB0aGlzLl9iYWxhbmNlID0gTWF0aC5tYXgoMCwgdik7IH0sCiAgZW51bWVyYWJsZTogdHJ1ZQp9KTsKCmFjY291bnQuYmFsYW5jZSA9IDI1MDsKY29uc29sZS5sb2coYWNjb3VudC5iYWxhbmNlKTsKYWNjb3VudC5iYWxhbmNlID0gLTUwOyAgICAgICAgICAvLyBjbGFtcGVkIGJ5IHRoZSBzZXR0ZXIKY29uc29sZS5sb2coYWNjb3VudC5iYWxhbmNlKTsKY29uc29sZS5sb2coImVudW1lcmFibGUga2V5czoiLCBPYmplY3Qua2V5cyhhY2NvdW50KSk7",
+  "es5-bind": "dmFyIGNvdW50ZXIgPSB7CiAgY291bnQ6IDAsCiAgaW5jOiBmdW5jdGlvbiAoKSB7IHRoaXMuY291bnQgKz0gMTsgcmV0dXJuIHRoaXMuY291bnQ7IH0KfTsKCi8vIGRldGFjaCB0aGUgbWV0aG9kIGJ1dCBsb2NrIGB0aGlzYCB0byBjb3VudGVyCnZhciBpbmMgPSBjb3VudGVyLmluYy5iaW5kKGNvdW50ZXIpOwpjb25zb2xlLmxvZyhpbmMoKSk7CmNvbnNvbGUubG9nKGluYygpKTsKY29uc29sZS5sb2coImludGVybmFsOiIsIGNvdW50ZXIuY291bnQpOw==",
+  "es6-let": "Y29uc3QgbGltaXQgPSA0OwpsZXQgdG90YWwgPSAwOwpmb3IgKGxldCBpID0gMDsgaSA8IGxpbWl0OyBpKyspIHsKICB0b3RhbCArPSBpOwp9CmNvbnNvbGUubG9nKCJ0b3RhbDoiLCB0b3RhbCk7CgovLyBgbGV0YC9gY29uc3RgIGFyZSBibG9jayBzY29wZWQg4oCUIGBpYCBkb2VzIG5vdCBsZWFrIG91dCBvZiB0aGUgbG9vcAp0cnkgewogIGNvbnNvbGUubG9nKGkpOwp9IGNhdGNoIChlKSB7CiAgY29uc29sZS5sb2coZS5uYW1lICsgIjogaSBpcyBub3QgZGVmaW5lZCBvdXQgaGVyZSIpOwp9",
+  "es6-arrow": "Y29uc3QgbnVtcyA9IFsxLCAyLCAzLCA0XTsKCmNvbnN0IHNxdWFyZXMgPSBudW1zLm1hcChuID0+IG4gKiBuKTsKY29uc3Qgc3VtID0gbnVtcy5yZWR1Y2UoKGEsIGIpID0+IGEgKyBiLCAwKTsKCmNvbnNvbGUubG9nKCJzcXVhcmVzOiIsIHNxdWFyZXMpOwpjb25zb2xlLmxvZygic3VtOiIsIHN1bSk7Cgpjb25zdCBncmVldCA9IG5hbWUgPT4gYEhpLCAke25hbWV9IWA7CmNvbnNvbGUubG9nKGdyZWV0KCJBbnRhcyIpKTs=",
+  "es6-tmpl": "Y29uc3QgdXNlciA9ICJBZGEiOwpjb25zdCBpdGVtcyA9IDM7Cgpjb25zdCBtc2cgPSBgJHt1c2VyfSBoYXMgJHtpdGVtc30gaXRlbSR7aXRlbXMgPT09IDEgPyAiIiA6ICJzIn0uClRlbXBsYXRlIGxpdGVyYWxzIGFsc28gc3BhbgptdWx0aXBsZSBsaW5lcyB3aXRob3V0ICJcbiIuYDsKCmNvbnNvbGUubG9nKG1zZyk7CmNvbnNvbGUubG9nKGAyICsgMiA9ICR7MiArIDJ9YCk7",
+  "es6-destr": "Y29uc3QgcG9pbnQgPSB7IHg6IDEwLCB5OiAyMCwgbWV0YTogeyBjb2xvcjogInJlZCIgfSB9Owpjb25zdCB7IHgsIHksIG1ldGE6IHsgY29sb3IgfSB9ID0gcG9pbnQ7CmNvbnNvbGUubG9nKHgsIHksIGNvbG9yKTsKCmNvbnN0IFtmaXJzdCwgLCB0aGlyZCwgLi4ucmVzdF0gPSBbMSwgMiwgMywgNCwgNV07CmNvbnNvbGUubG9nKCJmaXJzdDoiLCBmaXJzdCwgInRoaXJkOiIsIHRoaXJkLCAicmVzdDoiLCByZXN0KTsKCmNvbnN0IHN3YXAgPSAoW2EsIGJdKSA9PiBbYiwgYV07CmNvbnNvbGUubG9nKCJzd2FwcGVkOiIsIHN3YXAoWzEsIDJdKSk7",
+  "es6-spread": "ZnVuY3Rpb24gbWFrZVVzZXIobmFtZSwgcm9sZSA9ICJndWVzdCIsIC4uLnRhZ3MpIHsKICByZXR1cm4geyBuYW1lLCByb2xlLCB0YWdzIH07Cn0KCmNvbnNvbGUubG9nKG1ha2VVc2VyKCJCbyIpKTsKY29uc29sZS5sb2cobWFrZVVzZXIoIkN5IiwgImFkbWluIiwgImNvcmUiLCAiYmV0YSIpKTsKCmNvbnN0IGEgPSBbMSwgMl0sIGIgPSBbMywgNF07CmNvbnNvbGUubG9nKCJzcHJlYWQgYXJyYXlzOiIsIFsuLi5hLCAuLi5iXSk7CmNvbnNvbGUubG9nKCJzcHJlYWQgb2JqZWN0czoiLCB7IC4uLnsgaWQ6IDEgfSwgYWN0aXZlOiB0cnVlIH0pOw==",
+  "es6-class": "Y2xhc3MgQW5pbWFsIHsKICBjb25zdHJ1Y3RvcihuYW1lKSB7IHRoaXMubmFtZSA9IG5hbWU7IH0KICBzcGVhaygpIHsgcmV0dXJuIGAke3RoaXMubmFtZX0gbWFrZXMgYSBzb3VuZGA7IH0KfQoKY2xhc3MgRG9nIGV4dGVuZHMgQW5pbWFsIHsKICBzcGVhaygpIHsgcmV0dXJuIGAke3RoaXMubmFtZX0gYmFya3NgOyB9ICAgLy8gb3ZlcnJpZGUgKyBzdXBlciBhdmFpbGFibGUKfQoKY29uc29sZS5sb2cobmV3IEFuaW1hbCgiQ2F0Iikuc3BlYWsoKSk7CmNvbnNvbGUubG9nKG5ldyBEb2coIlJleCIpLnNwZWFrKCkpOwpjb25zb2xlLmxvZygiRG9nIGlzIGFuIEFuaW1hbD8iLCBuZXcgRG9nKCJSZXgiKSBpbnN0YW5jZW9mIEFuaW1hbCk7",
+  "es6-promise": "Y29uc3Qgd2FpdCA9IChtcywgdmFsKSA9PiBuZXcgUHJvbWlzZShyZXMgPT4gc2V0VGltZW91dCgoKSA9PiByZXModmFsKSwgbXMpKTsKCmNvbnN0IGEgPSBhd2FpdCB3YWl0KDEwLCAiZmlyc3QiKTsKY29uc29sZS5sb2coYSk7Cgpjb25zdCBib3RoID0gYXdhaXQgUHJvbWlzZS5hbGwoW3dhaXQoNSwgIngiKSwgd2FpdCg1LCAieSIpXSk7CmNvbnNvbGUubG9nKCJhbGwgc2V0dGxlZDoiLCBib3RoKTsKCmNvbnN0IHdpbm5lciA9IGF3YWl0IFByb21pc2UucmFjZShbd2FpdCgzMCwgInNsb3ciKSwgd2FpdCg1LCAiZmFzdCIpXSk7CmNvbnNvbGUubG9nKCJyYWNlIHdpbm5lcjoiLCB3aW5uZXIpOw==",
+  "es6-gen": "ZnVuY3Rpb24qIGZpYigpIHsKICBsZXQgYSA9IDAsIGIgPSAxOwogIHdoaWxlICh0cnVlKSB7IHlpZWxkIGE7IFthLCBiXSA9IFtiLCBhICsgYl07IH0KfQoKY29uc3QgZyA9IGZpYigpOwpjb25zdCBmaXJzdDYgPSBbXTsKZm9yIChsZXQgaSA9IDA7IGkgPCA2OyBpKyspIGZpcnN0Ni5wdXNoKGcubmV4dCgpLnZhbHVlKTsKY29uc29sZS5sb2coImZpYm9uYWNjaToiLCBmaXJzdDYpOwoKLy8gYW55IG9iamVjdCBjYW4gYmVjb21lIGl0ZXJhYmxlCmNvbnN0IHJhbmdlID0geyAqW1N5bWJvbC5pdGVyYXRvcl0oKSB7IHlpZWxkKiBbMTAsIDIwLCAzMF07IH0gfTsKY29uc29sZS5sb2coInNwcmVhZCBhbiBpdGVyYWJsZToiLCBbLi4ucmFuZ2VdKTs=",
+  "es6-mapset": "Y29uc3Qgc2VlbiA9IG5ldyBTZXQoWzEsIDIsIDIsIDMsIDMsIDNdKTsKY29uc29sZS5sb2coInVuaXF1ZSB2YWx1ZXM6IiwgWy4uLnNlZW5dKTsKCmNvbnN0IHNjb3JlcyA9IG5ldyBNYXAoKTsKc2NvcmVzLnNldCgiYWRhIiwgOTApLnNldCgiYm8iLCA3NSk7CmNvbnNvbGUubG9nKCJhZGE6Iiwgc2NvcmVzLmdldCgiYWRhIiksICJ8IHNpemU6Iiwgc2NvcmVzLnNpemUpOwoKZm9yIChjb25zdCBbbmFtZSwgc2NvcmVdIG9mIHNjb3JlcykgewogIGNvbnNvbGUubG9nKG5hbWUsICI9PiIsIHNjb3JlKTsKfQ==",
+  "es6-symbol": "Y29uc3QgSUQgPSBTeW1ib2woImlkIik7CmNvbnN0IHVzZXIgPSB7IG5hbWU6ICJBZGEiLCBbSURdOiA0MiB9OwoKY29uc29sZS5sb2codXNlci5uYW1lLCAifCBoaWRkZW46IiwgdXNlcltJRF0pOwpjb25zb2xlLmxvZygibm90IGluIGtleXM6IiwgT2JqZWN0LmtleXModXNlcikpOwpjb25zb2xlLmxvZygiZXZlcnkgU3ltYm9sIGlzIHVuaXF1ZToiLCBTeW1ib2woIngiKSA9PT0gU3ltYm9sKCJ4IikpOw==",
+  "es6-proxy": "Y29uc3QgdGFyZ2V0ID0geyBtc2c6ICJoaSIgfTsKCmNvbnN0IHNhZmUgPSBuZXcgUHJveHkodGFyZ2V0LCB7CiAgZ2V0KG9iaiwgcHJvcCkgewogICAgcmV0dXJuIHByb3AgaW4gb2JqCiAgICAgID8gUmVmbGVjdC5nZXQob2JqLCBwcm9wKQogICAgICA6IGA8bm8gcHJvcGVydHkgIiR7U3RyaW5nKHByb3ApfSI+YDsKICB9Cn0pOwoKY29uc29sZS5sb2coc2FmZS5tc2cpOwpjb25zb2xlLmxvZyhzYWZlLm1pc3NpbmcpOyAgIC8vIGludGVyY2VwdGVkLCBubyBjcmFzaA==",
+  "es6-modules": "Ly8gLS0tIG1hdGguanMgLS0tCmV4cG9ydCBjb25zdCBhZGQgPSAoYSwgYikgPT4gYSArIGI7CmV4cG9ydCBkZWZhdWx0IGZ1bmN0aW9uIG11bHRpcGx5KGEsIGIpIHsgcmV0dXJuIGEgKiBiOyB9CgovLyAtLS0gYXBwLmpzIC0tLQppbXBvcnQgbXVsdGlwbHksIHsgYWRkIH0gZnJvbSAiLi9tYXRoLmpzIjsKCmNvbnNvbGUubG9nKGFkZCgyLCAzKSk7ICAgICAgICAvLyA1CmNvbnNvbGUubG9nKG11bHRpcGx5KDIsIDMpKTsgICAvLyA2",
+  "es2016-misc": "Y29uc3QgYXJyID0gWzEsIDIsIE5hTl07CmNvbnNvbGUubG9nKCJpbmNsdWRlcyhOYU4pPyIsIGFyci5pbmNsdWRlcyhOYU4pKTsgIC8vIGluZGV4T2YgY2FuIG5ldmVyIGZpbmQgTmFOCmNvbnNvbGUubG9nKCJpbmNsdWRlcyg5KT8iLCBhcnIuaW5jbHVkZXMoOSkpOwoKY29uc29sZS5sb2coIjIgKiogMTAgPSIsIDIgKiogMTApOyAgICAgICAgICAgICAgICAgLy8gZXhwb25lbnRpYXRpb24gb3BlcmF0b3IKY29uc29sZS5sb2coIjMgKiogMyA9IiwgMyAqKiAzKTs=",
+  "es2017-async": "Y29uc3Qgd2FpdCA9IChtcywgdikgPT4gbmV3IFByb21pc2UociA9PiBzZXRUaW1lb3V0KCgpID0+IHIodiksIG1zKSk7Cgphc3luYyBmdW5jdGlvbiBsb2FkRGFzaGJvYXJkKCkgewogIGNvbnN0IHByb2ZpbGUgPSBhd2FpdCB3YWl0KDEwLCAicHJvZmlsZSBsb2FkZWQiKTsKICBjb25zdCBzZXR0aW5ncyA9IGF3YWl0IHdhaXQoMTAsICJzZXR0aW5ncyBsb2FkZWQiKTsKICByZXR1cm4gW3Byb2ZpbGUsIHNldHRpbmdzXTsKfQoKY29uc29sZS5sb2coYXdhaXQgbG9hZERhc2hib2FyZCgpKTs=",
+  "es2017-obj": "Y29uc3QgdXNlciA9IHsgbmFtZTogIkFkYSIsIGFnZTogMzAgfTsKCmNvbnNvbGUubG9nKCJlbnRyaWVzOiIsIE9iamVjdC5lbnRyaWVzKHVzZXIpKTsKY29uc29sZS5sb2coInZhbHVlczoiLCBPYmplY3QudmFsdWVzKHVzZXIpKTsKCmNvbnNvbGUubG9nKCJ6ZXJvLXBhZGRlZDoiLCAiNyIucGFkU3RhcnQoMywgIjAiKSk7CmNvbnNvbGUubG9nKCJkb3QtcGFkZGVkOiIsICJoaSIucGFkRW5kKDUsICIuIikpOw==",
+  "es2018-spread": "Y29uc3QgYmFzZSA9IHsgYTogMSwgYjogMiB9Owpjb25zdCBuZXh0ID0geyAuLi5iYXNlLCBjOiAzIH07ICAgICAgIC8vIG9iamVjdCBzcHJlYWQKY29uc3QgeyBhLCAuLi5vdGhlcnMgfSA9IG5leHQ7ICAgICAgICAvLyBvYmplY3QgcmVzdAoKY29uc29sZS5sb2coIm1lcmdlZDoiLCBuZXh0KTsKY29uc29sZS5sb2coInBsdWNrZWQgYToiLCBhLCAifCByZXN0OiIsIG90aGVycyk7",
+  "es2018-regex": "Y29uc3QgcmUgPSAvKD88eWVhcj5cZHs0fSktKD88bW9udGg+XGR7Mn0pLzsgICAvLyBuYW1lZCBjYXB0dXJlIGdyb3Vwcwpjb25zdCBtID0gIjIwMjYtMDYiLm1hdGNoKHJlKTsKCmNvbnNvbGUubG9nKCJ5ZWFyOiIsIG0uZ3JvdXBzLnllYXIpOwpjb25zb2xlLmxvZygibW9udGg6IiwgbS5ncm91cHMubW9udGgpOw==",
+  "es2018-finally": "Y29uc3Qgd2FpdCA9IChtcywgdikgPT4gbmV3IFByb21pc2UociA9PiBzZXRUaW1lb3V0KCgpID0+IHIodiksIG1zKSk7Cgpjb25zdCBkYXRhID0gYXdhaXQgd2FpdCgxMCwgInBheWxvYWQiKQogIC5maW5hbGx5KCgpID0+IGNvbnNvbGUubG9nKCJjbGVhbnVwIHJ1bnMgbm8gbWF0dGVyIHdoYXQiKSk7Cgpjb25zb2xlLmxvZygiZ290OiIsIGRhdGEpOw==",
+  "es2019-flat": "Y29uc3QgbmVzdGVkID0gWzEsIFsyLCBbMywgWzRdXV1dOwpjb25zb2xlLmxvZygiZmxhdChJbmZpbml0eSk6IiwgbmVzdGVkLmZsYXQoSW5maW5pdHkpKTsKCmNvbnNvbGUubG9nKCJmbGF0TWFwOiIsIFsxLCAyLCAzXS5mbGF0TWFwKG4gPT4gW24sIG4gKiAxMF0pKTs=",
+  "es2019-entries": "Y29uc3QgcGFpcnMgPSBbWyJhIiwgMV0sIFsiYiIsIDJdLCBbImMiLCAzXV07CmNvbnNvbGUubG9nKCJmcm9tRW50cmllczoiLCBPYmplY3QuZnJvbUVudHJpZXMocGFpcnMpKTsKCi8vIHJvdW5kLXRyaXA6IG9iamVjdCAtPiBlbnRyaWVzIC0+IHRyYW5zZm9ybSAtPiBvYmplY3QKY29uc3QgcHJpY2VzID0geyBwZW46IDIsIGJvb2s6IDggfTsKY29uc3Qgd2l0aFRheCA9IE9iamVjdC5mcm9tRW50cmllcygKICBPYmplY3QuZW50cmllcyhwcmljZXMpLm1hcCgoW2ssIHZdKSA9PiBbaywgdiAqIDEuMV0pCik7CmNvbnNvbGUubG9nKCJ3aXRoIHRheDoiLCB3aXRoVGF4KTs=",
+  "es2019-trim": "Y29uc3QgcGFkZGVkID0gIiAgIHRyaW0gbWUgICAiOwpjb25zb2xlLmxvZygiWyIgKyBwYWRkZWQudHJpbVN0YXJ0KCkgKyAiXSIpOwpjb25zb2xlLmxvZygiWyIgKyBwYWRkZWQudHJpbUVuZCgpICsgIl0iKTs=",
+  "es2020-chain": "Y29uc3QgZGF0YSA9IHsgcHJvZmlsZTogeyBjb250YWN0OiBudWxsIH0gfTsKCmNvbnNvbGUubG9nKGRhdGE/LnByb2ZpbGU/LmNvbnRhY3Q/LmVtYWlsID8/ICJubyBlbWFpbCBvbiBmaWxlIik7CmNvbnNvbGUubG9nKGRhdGE/Lm1pc3Npbmc/LmRlZXBseT8ubmVzdGVkKTsgICAgIC8vIHVuZGVmaW5lZCwgbm8gZXJyb3IKCmNvbnN0IGNvdW50ID0gMDsKY29uc29sZS5sb2coIj8/IGtlZXBzIDA6IiwgY291bnQgPz8gImZhbGxiYWNrIik7ICAvLyAwCmNvbnNvbGUubG9nKCJ8fCBkcm9wcyAwOiIsIGNvdW50IHx8ICJmYWxsYmFjayIpOyAgLy8gImZhbGxiYWNrIg==",
+  "es2020-bigint": "Y29uc3QgaHVnZSA9IDkwMDcxOTkyNTQ3NDA5OTFuOyAgICAgLy8gQmlnSW50IGxpdGVyYWwKY29uc29sZS5sb2coImJleW9uZCBzYWZlIGludDoiLCBodWdlICsgMm4pOwoKY29uc29sZS5sb2coImdsb2JhbFRoaXMgd29ya3MgZXZlcnl3aGVyZToiLCB0eXBlb2YgZ2xvYmFsVGhpcyk7Cgpjb25zdCB0ZXh0ID0gImExYjJjMyI7CmNvbnNvbGUubG9nKCJtYXRjaEFsbDoiLCBbLi4udGV4dC5tYXRjaEFsbCgvKFxkKS9nKV0ubWFwKHggPT4geFsxXSkpOw==",
+  "es2021-assign": "Y29uc3QgY29uZmlnID0geyByZXRyaWVzOiBudWxsLCBtb2RlOiAiIiwgY2FjaGU6IDUgfTsKCmNvbmZpZy5yZXRyaWVzID8/PSAzOyAgICAvLyBhc3NpZ24gb25seSBpZiBudWxsL3VuZGVmaW5lZApjb25maWcubW9kZSAgICB8fD0gImRlZmF1bHQiOyAgLy8gYXNzaWduIGlmIGZhbHN5CmNvbmZpZy5jYWNoZSAgICYmPSAxMDsgICAvLyBhc3NpZ24gb25seSBpZiB0cnV0aHkKCmNvbnNvbGUubG9nKGNvbmZpZyk7",
+  "es2021-misc": "Y29uc3QgYmlnID0gMV8wMDBfMDAwOyAgICAgICAgICAvLyBudW1lcmljIHNlcGFyYXRvcnMgKGp1c3QgdmlzdWFsKQpjb25zb2xlLmxvZygicmVhZGFibGUgbnVtYmVyOiIsIGJpZyk7Cgpjb25zb2xlLmxvZygicmVwbGFjZUFsbDoiLCAiYS1iLWMtZCIucmVwbGFjZUFsbCgiLSIsICIvIikpOwoKY29uc3Qgd2FpdCA9IChtcywgdikgPT4gbmV3IFByb21pc2UociA9PiBzZXRUaW1lb3V0KCgpID0+IHIodiksIG1zKSk7CmNvbnN0IGZhc3Rlc3QgPSBhd2FpdCBQcm9taXNlLmFueShbd2FpdCgyMCwgInNsb3ciKSwgd2FpdCg1LCAiZmFzdCIpXSk7CmNvbnNvbGUubG9nKCJmaXJzdCB0byByZXNvbHZlOiIsIGZhc3Rlc3QpOw==",
+  "es2022-class": "Y2xhc3MgQ291bnRlciB7CiAgI2NvdW50ID0gMDsgICAgICAgICAgICAgICAgIC8vIHRydWx5IHByaXZhdGUgZmllbGQKICBzdGF0aWMgbGFiZWwgPSAidjEiOyAgICAgICAgLy8gc3RhdGljIGZpZWxkCiAgc3RhdGljIHsgdGhpcy5yZWFkeSA9IHRydWU7IH0gIC8vIHN0YXRpYyBpbml0aWFsaXphdGlvbiBibG9jawoKICB0aWNrKCkgeyByZXR1cm4gKyt0aGlzLiNjb3VudDsgfQogIGdldCB2YWx1ZSgpIHsgcmV0dXJuIHRoaXMuI2NvdW50OyB9Cn0KCmNvbnN0IGMgPSBuZXcgQ291bnRlcigpOwpjLnRpY2soKTsgYy50aWNrKCk7IGMudGljaygpOwpjb25zb2xlLmxvZygidmFsdWU6IiwgYy52YWx1ZSwgInwgbGFiZWw6IiwgQ291bnRlci5sYWJlbCwgInwgcmVhZHk6IiwgQ291bnRlci5yZWFkeSk7CmNvbnNvbGUubG9nKCIjY291bnQgaXMgcHJpdmF0ZToiLCAhKCIjY291bnQiIGluIGMpKTs=",
+  "es2022-misc": "Y29uc3QgYXJyID0gWzEwLCAyMCwgMzAsIDQwXTsKY29uc29sZS5sb2coImF0KC0xKToiLCBhcnIuYXQoLTEpKTsgICAgLy8gbGFzdCBpdGVtLCBubyBsZW5ndGggbWF0aApjb25zb2xlLmxvZygiYXQoLTIpOiIsIGFyci5hdCgtMikpOwoKY29uc29sZS5sb2coImhhc093bjoiLCBPYmplY3QuaGFzT3duKHsgeDogMSB9LCAieCIpKTsKY29uc29sZS5sb2coImhhc093biAobWlzc2luZyk6IiwgT2JqZWN0Lmhhc093bih7IHg6IDEgfSwgInkiKSk7Cgpjb25zdCB3cmFwcGVkID0gbmV3IEVycm9yKCJoaWdoIGxldmVsIiwgeyBjYXVzZTogImxvdyBsZXZlbCBkZXRhaWwiIH0pOwpjb25zb2xlLmxvZygiZXJyb3IgY2F1c2U6Iiwgd3JhcHBlZC5jYXVzZSk7",
+  "es2023-copy": "Y29uc3QgbnVtcyA9IFszLCAxLCAyXTsKCmNvbnN0IHNvcnRlZCA9IG51bXMudG9Tb3J0ZWQoKTsgICAvLyByZXR1cm5zIGEgTkVXIGFycmF5CmNvbnNvbGUubG9nKCJzb3J0ZWQ6Iiwgc29ydGVkKTsKY29uc29sZS5sb2coIm9yaWdpbmFsIHVudG91Y2hlZDoiLCBudW1zKTsKCmNvbnNvbGUubG9nKCJ0b1JldmVyc2VkOiIsIG51bXMudG9SZXZlcnNlZCgpKTsKY29uc29sZS5sb2coIndpdGgoMCwgOTkpOiIsIG51bXMud2l0aCgwLCA5OSkpOw==",
+  "es2023-findlast": "Y29uc3QgZGF0YSA9IFt7IHY6IDEgfSwgeyB2OiA5IH0sIHsgdjogNCB9LCB7IHY6IDcgfV07Cgpjb25zb2xlLmxvZygiZmluZExhc3QgdiA+IDM6IiwgZGF0YS5maW5kTGFzdChvID0+IG8udiA+IDMpKTsKY29uc29sZS5sb2coImZpbmRMYXN0SW5kZXggdiA+IDM6IiwgZGF0YS5maW5kTGFzdEluZGV4KG8gPT4gby52ID4gMykpOw==",
+  "es2024-group": "Y29uc3QgcGVvcGxlID0gWwogIHsgbmFtZTogIkFkYSIsIHRlYW06ICJlbmciIH0sCiAgeyBuYW1lOiAiQm8iLCAgdGVhbTogImRlc2lnbiIgfSwKICB7IG5hbWU6ICJDeSIsICB0ZWFtOiAiZW5nIiB9LApdOwoKaWYgKHR5cGVvZiBPYmplY3QuZ3JvdXBCeSA9PT0gImZ1bmN0aW9uIikgewogIGNvbnN0IGJ5VGVhbSA9IE9iamVjdC5ncm91cEJ5KHBlb3BsZSwgcCA9PiBwLnRlYW0pOwogIGNvbnNvbGUubG9nKCJlbmc6IiwgYnlUZWFtLmVuZy5tYXAocCA9PiBwLm5hbWUpKTsKICBjb25zb2xlLmxvZygiZGVzaWduOiIsIGJ5VGVhbS5kZXNpZ24ubWFwKHAgPT4gcC5uYW1lKSk7Cn0gZWxzZSB7CiAgY29uc29sZS5sb2coIk9iamVjdC5ncm91cEJ5IG5vdCBpbiB0aGlzIHJ1bnRpbWUgeWV0IChFUzIwMjQpLiIpOwp9",
+  "es2024-resolvers": "Ly8gUHJvbWlzZS53aXRoUmVzb2x2ZXJzIGhhbmRzIHlvdSB0aGUgcmVzb2x2ZS9yZWplY3QgZnVuY3Rpb25zIHVwIGZyb250CmNvbnN0IHsgcHJvbWlzZSwgcmVzb2x2ZSB9ID0gUHJvbWlzZS53aXRoUmVzb2x2ZXJzKCk7CgpzZXRUaW1lb3V0KCgpID0+IHJlc29sdmUoInNldHRsZWQgZnJvbSB0aGUgb3V0c2lkZSIpLCAxMCk7Cgpjb25zb2xlLmxvZygid2FpdGluZy4uLiIpOwpjb25zb2xlLmxvZyhhd2FpdCBwcm9taXNlKTs=",
+  "es2025-iter": "ZnVuY3Rpb24qIG5hdHVyYWxzKCkgeyBsZXQgbiA9IDE7IHdoaWxlICh0cnVlKSB5aWVsZCBuKys7IH0KCi8vIGxhenkgaXRlcmF0b3IgaGVscGVycyDigJQgbm90aGluZyBjb21wdXRlcyB1bnRpbCAudG9BcnJheSgpCmNvbnN0IHJlc3VsdCA9IG5hdHVyYWxzKCkKICAubWFwKG4gPT4gbiAqIG4pCiAgLmZpbHRlcihuID0+IG4gJSAyID09PSAxKQogIC50YWtlKDUpCiAgLnRvQXJyYXkoKTsKCmNvbnNvbGUubG9nKCJmaXJzdCA1IG9kZCBzcXVhcmVzOiIsIHJlc3VsdCk7",
+  "es2025-set": "Y29uc3QgYSA9IG5ldyBTZXQoWzEsIDIsIDMsIDRdKTsKY29uc3QgYiA9IG5ldyBTZXQoWzMsIDQsIDUsIDZdKTsKCmNvbnNvbGUubG9nKCJ1bmlvbjoiLCBbLi4uYS51bmlvbihiKV0pOwpjb25zb2xlLmxvZygiaW50ZXJzZWN0aW9uOiIsIFsuLi5hLmludGVyc2VjdGlvbihiKV0pOwpjb25zb2xlLmxvZygiZGlmZmVyZW5jZToiLCBbLi4uYS5kaWZmZXJlbmNlKGIpXSk7CmNvbnNvbGUubG9nKCJkaXNqb2ludCBmcm9tIHs5fT8iLCBhLmlzRGlzam9pbnRGcm9tKG5ldyBTZXQoWzldKSkpOw==",
+  "es2025-try": "ZnVuY3Rpb24gcmlza3koeCkgewogIGlmICh4IDwgMCkgdGhyb3cgbmV3IEVycm9yKCJuZWdhdGl2ZSBpbnB1dCIpOwogIHJldHVybiB4ICogMjsKfQoKLy8gUHJvbWlzZS50cnkgcnVucyBzeW5jIGNvZGUgYnV0IGFsd2F5cyBnaXZlcyB5b3UgYSBQcm9taXNlICsgdW5pZmllZCBlcnJvcnMKY29uc29sZS5sb2coIm9rOiIsIGF3YWl0IFByb21pc2UudHJ5KCgpID0+IHJpc2t5KDUpKSk7Cgphd2FpdCBQcm9taXNlLnRyeSgoKSA9PiByaXNreSgtMSkpLmNhdGNoKGUgPT4gY29uc29sZS5sb2coImNhdWdodDoiLCBlLm1lc3NhZ2UpKTs=",
+  "es2025-escape": "Y29uc3QgdXNlcklucHV0ID0gImErYiAoYyk/IjsKCmlmICh0eXBlb2YgUmVnRXhwLmVzY2FwZSA9PT0gImZ1bmN0aW9uIikgewogIGNvbnN0IHNhZmUgPSBSZWdFeHAuZXNjYXBlKHVzZXJJbnB1dCk7CiAgY29uc29sZS5sb2coImVzY2FwZWQ6Iiwgc2FmZSk7CiAgY29uc29sZS5sb2coImxpdGVyYWwgbWF0Y2ggd29ya3M6IiwgbmV3IFJlZ0V4cChzYWZlKS50ZXN0KCJhK2IgKGMpPyIpKTsKfSBlbHNlIHsKICBjb25zb2xlLmxvZygiUmVnRXhwLmVzY2FwZSBub3QgaW4gdGhpcyBydW50aW1lIHlldCAoRVMyMDI1KS4iKTsKfQ==",
+  "es2026-temporal": "aWYgKHR5cGVvZiBUZW1wb3JhbCA9PT0gInVuZGVmaW5lZCIpIHsKICBjb25zb2xlLmxvZygiVGVtcG9yYWwgaXMgbm90IGVuYWJsZWQgaW4gdGhpcyBydW50aW1lIHlldC4iKTsKICBjb25zb2xlLmxvZygiSXQgcmVhY2hlZCBTdGFnZSA0IGZvciBFUzIwMjYg4oCUIHRyeSBOb2RlIDIyKyBvciBAanMtdGVtcG9yYWwvcG9seWZpbGwuIik7Cn0gZWxzZSB7CiAgY29uc3QgdG9kYXkgPSBUZW1wb3JhbC5Ob3cucGxhaW5EYXRlSVNPKCk7CiAgY29uc29sZS5sb2coInRvZGF5OiIsIHRvZGF5LnRvU3RyaW5nKCkpOwogIGNvbnNvbGUubG9nKCJpbiA5MCBkYXlzOiIsIHRvZGF5LmFkZCh7IGRheXM6IDkwIH0pLnRvU3RyaW5nKCkpOwoKICBjb25zdCBtZWV0aW5nID0gVGVtcG9yYWwuWm9uZWREYXRlVGltZS5mcm9tKCIyMDI2LTA2LTEzVDA5OjAwW0FzaWEvS29sa2F0YV0iKTsKICBjb25zb2xlLmxvZygiem9uZWQgKyBpbW11dGFibGU6IiwgbWVldGluZy50b1N0cmluZygpKTsKfQ==",
+  "es2026-using": "Ly8gRVMyMDI2OiBkZXRlcm1pbmlzdGljLCBhdXRvbWF0aWMgY2xlYW51cCB3aXRoIGB1c2luZ2AKZnVuY3Rpb24gb3BlbkZpbGUobmFtZSkgewogIHJldHVybiB7CiAgICBuYW1lLAogICAgW1N5bWJvbC5kaXNwb3NlXSgpIHsgY29uc29sZS5sb2coYGNsb3NpbmcgJHtuYW1lfWApOyB9CiAgfTsKfQoKewogIHVzaW5nIGZpbGUgPSBvcGVuRmlsZSgiZGF0YS50eHQiKTsKICBjb25zb2xlLmxvZyhgcmVhZGluZyAke2ZpbGUubmFtZX1gKTsKfSAgIC8vIGZpbGVbU3ltYm9sLmRpc3Bvc2VdKCkgcnVucyBhdXRvbWF0aWNhbGx5IGFzIHRoZSBibG9jayBleGl0cw==",
+  "es2026-dispose": "Ly8gVGhlIHNhbWUgbGlmZWN5Y2xlIHRoYXQgYHVzaW5nYCBhdXRvbWF0ZXMsIHdyaXR0ZW4gYnkgaGFuZCB0b2RheToKY29uc3QgcmVzb3VyY2UgPSB7CiAgW1N5bWJvbC5kaXNwb3NlXTogKCkgPT4gY29uc29sZS5sb2coImNsb3NpbmcgZGF0YS50eHQiKQp9OwoKdHJ5IHsKICBjb25zb2xlLmxvZygicmVhZGluZyBkYXRhLnR4dCIpOwogIC8vIC4uLndvcmsgdGhhdCBtaWdodCB0aHJvdy4uLgp9IGZpbmFsbHkgewogIHJlc291cmNlW1N5bWJvbC5kaXNwb3NlXSgpOyAgIC8vIGd1YXJhbnRlZWQgY2xlYW51cCDigJQgdGhpcyBpcyB3aGF0IGB1c2luZ2AgZ2l2ZXMgeW91Cn0=",
+  "es2026-sum": "aWYgKHR5cGVvZiBNYXRoLnN1bVByZWNpc2UgPT09ICJmdW5jdGlvbiIpIHsKICBjb25zb2xlLmxvZygiTWF0aC5zdW1QcmVjaXNlOiIsIE1hdGguc3VtUHJlY2lzZShbMC4xLCAwLjJdKSk7ICAvLyBleGFjdGx5IDAuMwp9IGVsc2UgewogIGNvbnNvbGUubG9nKCJNYXRoLnN1bVByZWNpc2Ugbm90IGluIHRoaXMgcnVudGltZSB5ZXQgKEVTMjAyNikuIik7Cn0KY29uc29sZS5sb2coIm5haXZlIDAuMSArIDAuMiA9IiwgMC4xICsgMC4yKTsgICAvLyB0aGUgY2xhc3NpYyBmbG9hdGluZy1wb2ludCBzdGluZw==",
+  "es2026-iserror": "Y29uc3QgcmVhbCA9IG5ldyBUeXBlRXJyb3IoImJvb20iKTsKY29uc3QgZmFrZSA9IHsgbmFtZTogIlR5cGVFcnJvciIsIG1lc3NhZ2U6ICJib29tIiB9OwoKaWYgKHR5cGVvZiBFcnJvci5pc0Vycm9yID09PSAiZnVuY3Rpb24iKSB7CiAgY29uc29sZS5sb2coInJlYWwgaXMgZXJyb3I/IiwgRXJyb3IuaXNFcnJvcihyZWFsKSk7CiAgY29uc29sZS5sb2coImZha2UgaXMgZXJyb3I/IiwgRXJyb3IuaXNFcnJvcihmYWtlKSk7ICAvLyBmYWxzZSDigJQgcm9idXN0IGFjcm9zcyByZWFsbXMKfSBlbHNlIHsKICBjb25zb2xlLmxvZygiRXJyb3IuaXNFcnJvciBub3QgaW4gdGhpcyBydW50aW1lIHlldCAoRVMyMDI2KS4iKTsKICBjb25zb2xlLmxvZygiaW5zdGFuY2VvZiBmYWxsYmFjazoiLCByZWFsIGluc3RhbmNlb2YgRXJyb3IsICIvIiwgZmFrZSBpbnN0YW5jZW9mIEVycm9yKTsKfQ==",
+  "es2026-base64": "Y29uc3QgYnl0ZXMgPSBuZXcgVGV4dEVuY29kZXIoKS5lbmNvZGUoIkhpIHRoZXJlIik7CgppZiAodHlwZW9mIGJ5dGVzLnRvQmFzZTY0ID09PSAiZnVuY3Rpb24iKSB7CiAgY29uc3QgYjY0ID0gYnl0ZXMudG9CYXNlNjQoKTsKICBjb25zb2xlLmxvZygidG9CYXNlNjQ6IiwgYjY0KTsKICBjb25zb2xlLmxvZygicm91bmQtdHJpcDoiLCBuZXcgVGV4dERlY29kZXIoKS5kZWNvZGUoVWludDhBcnJheS5mcm9tQmFzZTY0KGI2NCkpKTsKfSBlbHNlIHsKICBjb25zb2xlLmxvZygiVWludDhBcnJheSBiYXNlNjQgaGVscGVycyBub3QgaW4gdGhpcyBydW50aW1lIHlldCAoRVMyMDI2KS4iKTsKICBjb25zb2xlLmxvZygicmF3IGJ5dGVzOiIsIFsuLi5ieXRlc10pOwp9"
+};
+
+function decode(b64){
+  const bin = atob(b64);
+  const bytes = Uint8Array.from(bin, c => c.charCodeAt(0));
+  return new TextDecoder().decode(bytes);
+}
+let EVAL_OK = true;
+try { new Function("return 1")(); } catch (e) { EVAL_OK = false; }
+
+/* ============================================================
+   SYNTAX HIGHLIGHTER (lightweight tokenizer)
+   ============================================================ */
+const KEYWORDS = new Set(("await break case catch class const continue default delete do else export "+
+  "extends finally for function get if import in instanceof let new of return set static super switch "+
+  "this throw try typeof using var void while yield async from as").split(" "));
+const LITERALS = new Set("true false null undefined NaN Infinity".split(" "));
+
+function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+
+function highlight(code){
+  let out="", i=0; const n=code.length;
+  const reNum=/0[xX][0-9a-fA-F_]+n?|0[bB][01_]+n?|0[oO][0-7_]+n?|\d[\d_]*\.?[\d_]*(?:[eE][+-]?\d+)?n?|\.\d[\d_]*/y;
+  const reId=/[A-Za-z_$][A-Za-z0-9_$]*/y;
+  const span=(c,s)=>`<span class="t-${c}">${esc(s)}</span>`;
+  while(i<n){
+    const c=code[i], c2=code[i+1];
+    if(c==="/"&&c2==="/"){let j=i;while(j<n&&code[j]!=="\n")j++;out+=span("com",code.slice(i,j));i=j;continue;}
+    if(c==="/"&&c2==="*"){let j=i+2;while(j<n&&!(code[j]==="*"&&code[j+1]==="/"))j++;j=Math.min(n,j+2);out+=span("com",code.slice(i,j));i=j;continue;}
+    if(c==='"'||c==="'"){let j=i+1;while(j<n&&code[j]!==c){if(code[j]==="\\")j++;j++;}j=Math.min(n,j+1);out+=span("str",code.slice(i,j));i=j;continue;}
+    if(c==="`"){let j=i+1;while(j<n&&code[j]!=="`"){if(code[j]==="\\")j++;j++;}j=Math.min(n,j+1);out+=span("str",code.slice(i,j));i=j;continue;}
+    if(/[0-9]/.test(c)||(c==="."&&/[0-9]/.test(c2||""))){reNum.lastIndex=i;const mm=reNum.exec(code);if(mm&&mm.index===i){out+=span("num",mm[0]);i+=mm[0].length;continue;}}
+    if(/[A-Za-z_$]/.test(c)){reId.lastIndex=i;const mm=reId.exec(code);const w=mm[0];let k="pun";
+      if(KEYWORDS.has(w))k="key";
+      else if(LITERALS.has(w))k="lit";
+      else{let j=i+w.length;while(j<n&&/\s/.test(code[j]))j++;
+        if(code[j]==="(")k="fn";
+        else if(/^[A-Z]/.test(w))k="type";
+        else k=null;}
+      out+= k? span(k,w): esc(w);
+      i+=w.length;continue;}
+    out+=esc(c);i++;
+  }
+  return out;
+}
+
+/* ============================================================
+   CONSOLE-OUTPUT FORMATTER (mimics console.log)
+   ============================================================ */
+function quote(s){return '"'+s.replace(/\\/g,"\\\\").replace(/"/g,'\\"')+'"';}
+function inner(v,seen,d){
+  const t=typeof v;
+  if(v===null)return"null";
+  if(t==="undefined")return"undefined";
+  if(t==="string")return quote(v);
+  if(t==="bigint")return v+"n";
+  if(t==="symbol")return v.toString();
+  if(t==="function")return"[Function: "+(v.name||"anonymous")+"]";
+  if(t==="number"||t==="boolean")return String(v);
+  return objFmt(v,seen,d);
+}
+function objFmt(v,seen,d){
+  if(seen.has(v))return"[Circular]";
+  if(d>4)return"…";
+  seen.add(v);let r;
+  try{
+    if(Array.isArray(v)){
+      r=v.length? "[ "+v.map(x=>inner(x,seen,d+1)).join(", ")+" ]":"[]";
+    }else if(v instanceof Map){
+      const p=[];v.forEach((val,k)=>p.push(inner(k,seen,d+1)+" => "+inner(val,seen,d+1)));
+      r=`Map(${v.size}) {`+(p.length?" "+p.join(", ")+" ":"")+"}";
+    }else if(v instanceof Set){
+      const p=[];v.forEach(val=>p.push(inner(val,seen,d+1)));
+      r=`Set(${v.size}) {`+(p.length?" "+p.join(", ")+" ":"")+"}";
+    }else if(v instanceof Date){ r=v.toISOString(); }
+    else if(v instanceof RegExp){ r=v.toString(); }
+    else if(v instanceof Error){ r=v.name+": "+v.message; }
+    else{
+      const keys=Object.keys(v);
+      const p=keys.map(k=>(/^[A-Za-z_$][\w$]*$/.test(k)?k:quote(k))+": "+inner(v[k],seen,d+1));
+      const cn=v.constructor&&v.constructor.name&&v.constructor.name!=="Object"?v.constructor.name+" ":"";
+      r=cn+"{"+(p.length?" "+p.join(", ")+" ":"")+"}";
+    }
+  }catch(e){ r="[Unprintable]"; }
+  seen.delete(v);return r;
+}
+function fmt(v){ return typeof v==="string"? v : inner(v,new Set(),0); }
+
+/* ============================================================
+   EXECUTOR — captures console output, supports await
+   ============================================================ */
+async function execute(source){
+  if(!EVAL_OK){ return [{type:"warn",text:"Live execution is blocked in this embedded preview. Open this file in a new browser tab (or download it) to run and edit \u2014 every snippet here is real, runnable code."}]; }
+  const logs=[];
+  const mk=type=>(...a)=>logs.push({type,text:a.map(fmt).join(" ")});
+  const sandbox={log:mk("log"),info:mk("log"),debug:mk("log"),warn:mk("warn"),error:mk("error"),
+    table:(d)=>logs.push({type:"log",text:fmt(d)})};
+  try{
+    const fn=new Function("console","return (async()=>{\n"+source+"\n})()");
+    const timeout=new Promise((_,rej)=>setTimeout(()=>rej(new Error("(execution timed out)")),3000));
+    await Promise.race([fn(sandbox),timeout]);
+  }catch(e){
+    logs.push({type:"error",text:(e&&e.name?e.name+": "+e.message:String(e))});
+  }
+  return logs;
+}
+function renderOutput(el,logs){
+  el.classList.add("show");
+  if(!logs.length){ el.innerHTML='<div class="out-row empty"><span class="gut">›</span>(no console output)</div>'; return; }
+  el.innerHTML=logs.map(l=>`<div class="out-row ${l.type}"><span class="gut">›</span>${esc(l.text)}</div>`).join("");
+}
+
+/* ============================================================
+   EDITOR (textarea over highlighted <pre>)
+   ============================================================ */
+function makeEditor(code){
+  const wrap=document.createElement("div");wrap.className="editor";
+  const pre=document.createElement("pre");pre.setAttribute("aria-hidden","true");
+  const codeEl=document.createElement("code");pre.appendChild(codeEl);
+  const ta=document.createElement("textarea");
+  ta.spellcheck=false;ta.setAttribute("autocomplete","off");ta.setAttribute("autocapitalize","off");ta.setAttribute("wrap","off");
+  ta.value=code;
+  const paint=()=>{ codeEl.innerHTML=highlight(ta.value)+(ta.value.endsWith("\n")?" ":""); };
+  const sync=()=>{ pre.scrollTop=ta.scrollTop;pre.scrollLeft=ta.scrollLeft; };
+  ta.addEventListener("input",paint);
+  ta.addEventListener("scroll",sync);
+  ta.addEventListener("keydown",e=>{
+    if(e.key==="Tab"){e.preventDefault();const s=ta.selectionStart,en=ta.selectionEnd;
+      ta.value=ta.value.slice(0,s)+"  "+ta.value.slice(en);ta.selectionStart=ta.selectionEnd=s+2;paint();}
+  });
+  paint();
+  wrap.appendChild(pre);wrap.appendChild(ta);
+  return {wrap,ta};
+}
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+const railEl=document.getElementById("rail");
+const navEl=document.getElementById("nav");
+const mainEl=document.getElementById("main");
+let activeId=null;
+const runners=[]; // {run} for "run all"
+
+ERAS.forEach(era=>{
+  const tick=document.createElement("button");
+  tick.className="tick";tick.dataset.id=era.id;
+  tick.innerHTML=`<span class="yr">${era.yr}</span><span class="ed">${era.ed.split(" ")[0]}</span>`;
+  tick.onclick=()=>select(era.id,true);
+  railEl.appendChild(tick);
+
+  const ni=document.createElement("button");
+  ni.className="nav-item";ni.dataset.id=era.id;
+  ni.innerHTML=`<span class="nyr">${era.yr} · ${era.ed}</span>${era.name}`;
+  ni.onclick=()=>select(era.id,true);
+  navEl.appendChild(ni);
+});
+
+function select(id,scroll){
+  if(id===activeId)return;
+  activeId=id;
+  const era=ERAS.find(e=>e.id===id);
+  document.querySelectorAll(".tick").forEach(t=>t.classList.toggle("active",t.dataset.id===id));
+  document.querySelectorAll(".nav-item").forEach(t=>t.classList.toggle("active",t.dataset.id===id));
+  const active=document.querySelector(".tick.active");
+  if(active&&scroll)active.scrollIntoView({inline:"center",block:"nearest",behavior:"smooth"});
+  history.replaceState(null,"","#"+id);
+  renderEra(era);
+}
+
+function renderEra(era){
+  runners.length=0;
+  mainEl.innerHTML="";
+  const head=document.createElement("div");
+  head.className="era-head fade";
+  head.innerHTML=`
+    <div class="meta">
+      <span class="big-yr">${era.yr}</span>
+      <span class="edition">${era.ed}</span>
+    </div>
+    <div class="name">${era.name}</div>
+    <p class="blurb">${era.blurb}</p>
+    <div class="era-actions"></div>`;
+  mainEl.appendChild(head);
+
+  era.features.forEach(f=>{
+   try{
+    const raw=CODE[f.code]; if(!raw) return; const code=decode(raw).trim();
+    const card=document.createElement("div");card.className="card";
+    const previewPill=f.illustrative?`<span class="pill preview">syntax preview</span>`:"";
+    card.innerHTML=`
+      <div class="card-head">
+        <div class="ft"><code>${esc(f.ft)}</code>${previewPill}</div>
+        <div class="desc">${f.desc}</div>
+      </div>`;
+    if(f.note)card.insertAdjacentHTML("beforeend",`<div class="note">${f.note}</div>`);
+
+    const {wrap,ta}=makeEditor(code);
+    card.appendChild(wrap);
+
+    const bar=document.createElement("div");bar.className="editor-bar";
+    bar.innerHTML=`<span class="tag">${f.code}.js</span><div class="btns"></div>`;
+    const btns=bar.querySelector(".btns");
+    const out=document.createElement("div");out.className="out";
+
+    if(f.illustrative){
+      bar.querySelector(".tag").textContent="not runnable here — read it";
+    }else{
+      const reset=document.createElement("button");reset.className="btn";reset.textContent="Reset";
+      reset.onclick=()=>{ta.value=code;ta.dispatchEvent(new Event("input"));out.classList.remove("show");};
+      const run=document.createElement("button");run.className="btn run";run.innerHTML="▶ Run";
+      const doRun=async()=>{run.disabled=true;const logs=await execute(ta.value);renderOutput(out,logs);run.disabled=false;};
+      run.onclick=doRun;
+      runners.push(doRun);
+      ta.addEventListener("keydown",e=>{
+        if((e.metaKey||e.ctrlKey)&&e.key==="Enter"){e.preventDefault();doRun();}
+      });
+      btns.appendChild(reset);btns.appendChild(run);
+    }
+    card.appendChild(bar);card.appendChild(out);
+    mainEl.appendChild(card);
+   }catch(err){ console.warn("card render failed:",f.code,err); }
+  });
+
+  if(runners.length>1){
+    const all=document.createElement("button");all.className="btn run";all.innerHTML=`▶ Run all ${runners.length} examples`;
+    all.onclick=async()=>{all.disabled=true;for(const r of runners)await r();all.disabled=false;};
+    head.querySelector(".era-actions").appendChild(all);
+  }
+}
+
+if(!EVAL_OK){
+  const b=document.createElement("div");
+  b.style.cssText="max-width:1320px;margin:0 auto;padding:12px clamp(16px,4vw,48px);font-family:var(--mono);font-size:12.5px;color:var(--warn);border-bottom:1px solid var(--line);background:rgba(255,203,107,.06)";
+  b.innerHTML="\u26a0 Live \u201cRun\u201d is disabled in this embedded preview (the sandbox blocks code execution). Use the \u2197 open-in-new-tab / download option to run and edit every snippet for real. All code below is genuine and renders fully.";
+  document.querySelector(".rail-wrap").after(b);
+}
+/* theme toggle */
+(function(){
+  var root=document.documentElement, btn=document.getElementById("themeToggle");
+  var SUN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
+  var MOON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg>';
+  function apply(t){ root.setAttribute("data-theme",t); btn.innerHTML = (t==="light"? MOON+"<span>Dark</span>" : SUN+"<span>Light</span>"); }
+  var theme = root.getAttribute("data-theme")==="light" ? "light":"dark";
+  apply(theme);
+  btn.addEventListener("click", function(){ theme = theme==="light"?"dark":"light"; apply(theme); });
+})();
+
+// init from hash or default to ES6 (the renaissance — best first impression)
+const startId=(location.hash||"").replace("#","");
+select(ERAS.some(e=>e.id===startId)?startId:"es2015");
+</script>
+</body>
+</html>

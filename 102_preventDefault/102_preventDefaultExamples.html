@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>preventDefault() Examples</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    section {
+      margin-bottom: 30px;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    h2 {
+      color: #333;
+    }
+    pre {
+      background: #f4f4f4;
+      padding: 10px;
+      border-radius: 5px;
+      overflow-x: auto;
+    }
+    .error {
+      color: red;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>preventDefault() Examples</h1>
+
+  <!-- 1. Preventing Form Submission -->
+  <section>
+    <h2>1. Preventing Form Submission</h2>
+    <form id="example-form">
+      <input type="text" name="username" placeholder="Username" required />
+      <input type="password" name="password" placeholder="Password" required />
+      <button type="submit">Submit</button>
+    </form>
+    <p class="error" id="form-error">Please fill out all fields.</p>
+    <pre>
+      <code>
+document.querySelector('#example-form').addEventListener('submit', function (event) {
+  event.preventDefault(); // Prevent the form from submitting
+
+  const username = event.target.username.value.trim();
+  const password = event.target.password.value.trim();
+
+  if (!username || !password) {
+    document.getElementById('form-error').style.display = 'block';
+  } else {
+    console.log('Form Data:', { username, password });
+    alert('Form submitted successfully!');
+  }
+});
+      </code>
+    </pre>
+  </section>
+
+  <!-- 2. Preventing Link Navigation -->
+  <section>
+    <h2>2. Preventing Link Navigation</h2>
+    <a href="https://example.com" id="example-link">Click Me</a>
+    <pre>
+      <code>
+document.querySelector('#example-link').addEventListener('click', function (event) {
+  event.preventDefault(); // Prevent the link from navigating
+  console.log('Link clicked, but navigation prevented.');
+  alert('Link clicked, but navigation prevented.');
+});
+      </code>
+    </pre>
+  </section>
+
+  <!-- 3. Preventing Default Keyboard Behavior -->
+  <section>
+    <h2>3. Preventing Default Keyboard Behavior</h2>
+    <input type="text" id="example-input" placeholder="Press Enter" />
+    <pre>
+      <code>
+document.querySelector('#example-input').addEventListener('keydown', function (event) {
+  if (event.key === 'Enter') {
+    event.preventDefault(); // Prevent form submission on Enter key
+    console.log('Enter key pressed, but default behavior prevented.');
+    alert('Enter key pressed, but default behavior prevented.');
+  }
+});
+      </code>
+    </pre>
+  </section>
+
+  <!-- 4. Preventing Context Menu (Right-Click) -->
+  <section>
+    <h2>4. Preventing Context Menu (Right-Click)</h2>
+    <p>Right-click anywhere on this section.</p>
+    <pre>
+      <code>
+document.addEventListener('contextmenu', function (event) {
+  event.preventDefault(); // Prevent the context menu from appearing
+  console.log('Right-click disabled.');
+  alert('Right-click disabled.');
+});
+      </code>
+    </pre>
+  </section>
+
+  <!-- 5. Preventing Drag-and-Drop Behavior -->
+  <section>
+    <h2>5. Preventing Drag-and-Drop Behavior</h2>
+    <div id="drop-zone" style="border: 2px dashed #ccc; padding: 20px; text-align: center;">
+      Drag and drop files here
+    </div>
+    <pre>
+      <code>
+document.addEventListener('dragover', function (event) {
+  event.preventDefault(); // Prevent the default drag-and-drop behavior
+});
+
+document.addEventListener('drop', function (event) {
+  event.preventDefault(); // Prevent the default drop behavior
+  console.log('File dropped:', event.dataTransfer.files);
+  alert('File dropped! Check the console for details.');
+});
+      </code>
+    </pre>
+  </section>
+
+  <!-- 6. Difference Between preventDefault() and stopPropagation() -->
+  <section>
+    <h2>6. Difference Between preventDefault() and stopPropagation()</h2>
+    <a href="https://example.com" id="example-link-2">Click Me</a>
+    <pre>
+      <code>
+document.querySelector('#example-link-2').addEventListener('click', function (event) {
+  event.preventDefault(); // Prevent navigation
+  event.stopPropagation(); // Stop the event from bubbling up
+  console.log('Link clicked, but default behavior and propagation stopped.');
+  alert('Link clicked, but default behavior and propagation stopped.');
+});
+      </code>
+    </pre>
+  </section>
+
+  <script>
+    // 1. Preventing Form Submission
+    document.querySelector('#example-form').addEventListener('submit', function (event) {
+      event.preventDefault(); // Prevent the form from submitting
+
+      const username = event.target.username.value.trim();
+      const password = event.target.password.value.trim();
+
+      if (!username || !password) {
+        document.getElementById('form-error').style.display = 'block';
+      } else {
+        console.log('Form Data:', { username, password });
+        alert('Form submitted successfully!');
+      }
+    });
+
+    // 2. Preventing Link Navigation
+    document.querySelector('#example-link').addEventListener('click', function (event) {
+      event.preventDefault(); // Prevent the link from navigating
+      console.log('Link clicked, but navigation prevented.');
+      alert('Link clicked, but navigation prevented.');
+    });
+
+    // 3. Preventing Default Keyboard Behavior
+    document.querySelector('#example-input').addEventListener('keydown', function (event) {
+      if (event.key === 'Enter') {
+        event.preventDefault(); // Prevent form submission on Enter key
+        console.log('Enter key pressed, but default behavior prevented.');
+        alert('Enter key pressed, but default behavior prevented.');
+      }
+    });
+
+    // 4. Preventing Context Menu (Right-Click)
+    document.addEventListener('contextmenu', function (event) {
+      event.preventDefault(); // Prevent the context menu from appearing
+      console.log('Right-click disabled.');
+      alert('Right-click disabled.');
+    });
+
+    // 5. Preventing Drag-and-Drop Behavior
+    document.addEventListener('dragover', function (event) {
+      event.preventDefault(); // Prevent the default drag-and-drop behavior
+    });
+
+    document.addEventListener('drop', function (event) {
+      event.preventDefault(); // Prevent the default drop behavior
+      console.log('File dropped:', event.dataTransfer.files);
+      alert('File dropped! Check the console for details.');
+    });
+
+    // 6. Difference Between preventDefault() and stopPropagation()
+    document.querySelector('#example-link-2').addEventListener('click', function (event) {
+      event.preventDefault(); // Prevent navigation
+      event.stopPropagation(); // Stop the event from bubbling up
+      console.log('Link clicked, but default behavior and propagation stopped.');
+      alert('Link clicked, but default behavior and propagation stopped.');
+    });
+  </script>
+</body>
+</html>
