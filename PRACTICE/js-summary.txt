@@ -1,0 +1,26 @@
+call, apply, bind, 
+Event Loop, call stack, hoisting, debounce, throttle, closures, callback,
+function/block scope, IIFE, DOM tree, shallow/deep copy, 
+setTimemout, setInterval, promise, fetch async/await, loops, objects, arrays,
+event bubbling/capturing, lamba arrow function, spread/rest operator,
+memoization, ES6, map/reduce/filter, polyfills, recursion,
+factories and classes, prototypal inheritance and chain,
+collections and generators, inheritance, polymorphism, 
+web worker, service worker
+
+Form based questions
+array/string/object manipulation
+UI based questions
+Todo/Counter/Dashboard/Product/Blog/Library/Bookstore example
+REST CRUD API endpoint
+
+problem solving & data structures:
+searching/sorting, stack/queue, 2D/3D Arrays
+palindrome, reverse, split, 
+
+
+ReactJS
+component, state, props, hooks,
+react-router, react-query
+contextAPI, redux, saga, thunk,
+class/functional component, suspense, 

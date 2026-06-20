@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Web Workers Fundamentals</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 1000px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .section {
+      background: white;
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    h2 {
+      color: #333;
+      border-bottom: 2px solid #4CAF50;
+      padding-bottom: 10px;
+    }
+    button {
+      background: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      margin: 5px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    button:hover {
+      background: #45a049;
+    }
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    .output {
+      background: #f9f9f9;
+      padding: 15px;
+      margin: 10px 0;
+      border-left: 4px solid #4CAF50;
+      min-height: 40px;
+      font-family: monospace;
+    }
+    .error {
+      border-left-color: #f44336;
+      color: #f44336;
+    }
+    input[type="number"] {
+      padding: 8px;
+      margin: 5px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    .status {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      margin-left: 10px;
+    }
+    .status.running {
+      background: #fff3cd;
+      color: #856404;
+    }
+    .status.complete {
+      background: #d4edda;
+      color: #155724;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔧 Web Workers - Complete Fundamentals</h1>
+
+  <!-- 1. Basic Worker Creation & Communication -->
+  <div class="section">
+    <h2>1. Basic Worker Communication</h2>
+    <p>Demonstrates creating a worker, sending messages, and receiving responses.</p>
+    <button onclick="basicWorkerDemo()">Send Message to Worker</button>
+    <div id="basic-output" class="output">Click the button to start...</div>
+  </div>
+
+  <!-- 2. Heavy Computation (Non-blocking) -->
+  <div class="section">
+    <h2>2. Heavy Computation (Non-blocking UI)</h2>
+    <p>Shows how workers prevent UI blocking during intensive tasks.</p>
+    <input type="number" id="calc-input" value="40" min="1" max="45">
+    <button onclick="calculateWithWorker()">Calculate Fibonacci (Worker)</button>
+    <button onclick="calculateWithoutWorker()">Calculate Fibonacci (Main Thread)</button>
+    <div id="calc-output" class="output">Ready to calculate...</div>
+    <div>
+      <label>Test UI Responsiveness: <input type="range" id="slider" min="0" max="100" value="50"></label>
+      <span id="slider-value">50</span>
+    </div>
+  </div>
+
+  <!-- 3. Transferable Objects -->
+  <div class="section">
+    <h2>3. Transferable Objects (Zero-copy Transfer)</h2>
+    <p>Demonstrates efficient data transfer using Transferable objects.</p>
+    <button onclick="transferableDemo()">Transfer Large ArrayBuffer</button>
+    <div id="transfer-output" class="output">Click to see transferable objects in action...</div>
+  </div>
+
+  <!-- 4. Error Handling -->
+  <div class="section">
+    <h2>4. Error Handling</h2>
+    <p>Shows how to handle errors in workers.</p>
+    <button onclick="errorDemo()">Trigger Worker Error</button>
+    <div id="error-output" class="output">Click to trigger an error...</div>
+  </div>
+
+  <!-- 5. Multiple Workers -->
+  <div class="section">
+    <h2>5. Multiple Workers (Parallel Processing)</h2>
+    <p>Running multiple workers simultaneously for parallel tasks.</p>
+    <button onclick="multiWorkerDemo()">Process with 4 Workers</button>
+    <div id="multi-output" class="output">Click to start parallel processing...</div>
+  </div>
+
+  <!-- 6. Worker Termination -->
+  <div class="section">
+    <h2>6. Worker Lifecycle & Termination</h2>
+    <p>Control worker lifecycle: start, terminate, and restart.</p>
+    <button onclick="startLongTask()">Start Long Task</button>
+    <button onclick="terminateWorkerDemo()">Terminate Worker</button>
+    <div id="lifecycle-output" class="output">Worker ready...</div>
+  </div>
+
+  <!-- 7. Shared Worker -->
+  <div class="section">
+    <h2>7. Shared Worker (Cross-tab Communication)</h2>
+    <p>SharedWorker can be accessed by multiple browser tabs/windows.</p>
+    <button onclick="sharedWorkerDemo()">Connect to Shared Worker</button>
+    <button onclick="sendToShared()">Send Message</button>
+    <div id="shared-output" class="output">Open this page in multiple tabs to test...</div>
+  </div>
+
+  <script>
+    // Slider interaction demo
+    document.getElementById('slider').addEventListener('input', (e) => {
+      document.getElementById('slider-value').textContent = e.target.value;
+    });
+
+    // 1. BASIC WORKER
+    const basicWorkerCode = `
+      self.onmessage = function(e) {
+        const result = 'Worker received: ' + e.data;
+        self.postMessage(result);
+      };
+    `;
+
+    function basicWorkerDemo() {
+      const blob = new Blob([basicWorkerCode], { type: 'application/javascript' });
+      const worker = new Worker(URL.createObjectURL(blob));
+      
+      worker.onmessage = function(e) {
+        document.getElementById('basic-output').textContent = e.data;
+      };
+      
+      worker.postMessage('Hello from main thread!');
+    }
+
+    // 2. HEAVY COMPUTATION
+    const fibWorkerCode = `
+      function fibonacci(n) {
+        if (n <= 1) return n;
+        return fibonacci(n - 1) + fibonacci(n - 2);
+      }
+      
+      self.onmessage = function(e) {
+        const start = performance.now();
+        const result = fibonacci(e.data);
+        const time = (performance.now() - start).toFixed(2);
+        self.postMessage({ result, time });
+      };
+    `;
+
+    let fibWorker;
+
+    function calculateWithWorker() {
+      const n = parseInt(document.getElementById('calc-input').value);
+      const output = document.getElementById('calc-output');
+      output.innerHTML = 'Calculating in worker... <span class="status running">RUNNING</span>';
+      
+      if (fibWorker) fibWorker.terminate();
+      const blob = new Blob([fibWorkerCode], { type: 'application/javascript' });
+      fibWorker = new Worker(URL.createObjectURL(blob));
+      
+      fibWorker.onmessage = function(e) {
+        output.innerHTML = `Fibonacci(${n}) = ${e.data.result}<br>Time: ${e.data.time}ms <span class="status complete">COMPLETE</span><br>✅ UI remained responsive!`;
+      };
+      
+      fibWorker.postMessage(n);
+    }
+
+    function calculateWithoutWorker() {
+      const n = parseInt(document.getElementById('calc-input').value);
+      const output = document.getElementById('calc-output');
+      output.innerHTML = 'Calculating on main thread... <span class="status running">RUNNING</span>';
+      
+      setTimeout(() => {
+        const start = performance.now();
+        function fib(n) {
+          if (n <= 1) return n;
+          return fib(n - 1) + fib(n - 2);
+        }
+        const result = fib(n);
+        const time = (performance.now() - start).toFixed(2);
+        output.innerHTML = `Fibonacci(${n}) = ${result}<br>Time: ${time}ms <span class="status complete">COMPLETE</span><br>⚠️ UI was blocked during calculation!`;
+      }, 10);
+    }
+
+    // 3. TRANSFERABLE OBJECTS
+    const transferWorkerCode = `
+      self.onmessage = function(e) {
+        const buffer = e.data;
+        const view = new Uint32Array(buffer);
+        let sum = 0;
+        for (let i = 0; i < view.length; i++) {
+          sum += view[i];
+        }
+        self.postMessage({ sum, length: view.length }, [buffer]);
+      };
+    `;
+
+    function transferableDemo() {
+      const output = document.getElementById('transfer-output');
+      const size = 1000000;
+      const buffer = new ArrayBuffer(size * 4);
+      const view = new Uint32Array(buffer);
+      
+      for (let i = 0; i < size; i++) {
+        view[i] = i;
+      }
+      
+      output.textContent = `Created ArrayBuffer: ${(buffer.byteLength / 1024 / 1024).toFixed(2)} MB`;
+      
+      const blob = new Blob([transferWorkerCode], { type: 'application/javascript' });
+      const worker = new Worker(URL.createObjectURL(blob));
+      
+      worker.onmessage = function(e) {
+        output.innerHTML += `<br>Worker calculated sum: ${e.data.sum}<br>✅ Buffer transferred (not copied) - zero-copy operation!<br>Main thread buffer length: ${buffer.byteLength} (now 0 because ownership transferred)`;
+      };
+      
+      worker.postMessage(buffer, [buffer]);
+    }
+
+    // 4. ERROR HANDLING
+    const errorWorkerCode = `
+      self.onmessage = function(e) {
+        if (e.data === 'error') {
+          throw new Error('Intentional error from worker!');
+        }
+        self.postMessage('No error');
+      };
+    `;
+
+    function errorDemo() {
+      const output = document.getElementById('error-output');
+      const blob = new Blob([errorWorkerCode], { type: 'application/javascript' });
+      const worker = new Worker(URL.createObjectURL(blob));
+      
+      worker.onerror = function(error) {
+        output.className = 'output error';
+        output.innerHTML = `❌ Error caught!<br>Message: ${error.message}<br>Filename: ${error.filename}<br>Line: ${error.lineno}`;
+      };
+      
+      worker.onmessage = function(e) {
+        output.className = 'output';
+        output.textContent = '✅ ' + e.data;
+      };
+      
+      worker.postMessage('error');
+    }
+
+    // 5. MULTIPLE WORKERS
+    const multiWorkerCode = `
+      self.onmessage = function(e) {
+        const { id, data } = e.data;
+        let sum = 0;
+        for (let i = 0; i < data.length; i++) {
+          sum += data[i];
+        }
+        self.postMessage({ id, sum });
+      };
+    `;
+
+    function multiWorkerDemo() {
+      const output = document.getElementById('multi-output');
+      const workerCount = 4;
+      const dataSize = 1000000;
+      const chunkSize = dataSize / workerCount;
+      
+      output.innerHTML = `Creating ${workerCount} workers...<br>`;
+      
+      const workers = [];
+      const results = [];
+      let completed = 0;
+      
+      for (let i = 0; i < workerCount; i++) {
+        const blob = new Blob([multiWorkerCode], { type: 'application/javascript' });
+        const worker = new Worker(URL.createObjectURL(blob));
+        
+        worker.onmessage = function(e) {
+          results[e.data.id] = e.data.sum;
+          completed++;
+          output.innerHTML += `Worker ${e.data.id} completed: sum = ${e.data.sum}<br>`;
+          
+          if (completed === workerCount) {
+            const total = results.reduce((a, b) => a + b, 0);
+            output.innerHTML += `<br>✅ All workers completed!<br>Total sum: ${total}`;
+            workers.forEach(w => w.terminate());
+          }
+        };
+        
+        workers.push(worker);
+        
+        const chunk = new Array(chunkSize).fill(0).map((_, idx) => idx + i * chunkSize);
+        worker.postMessage({ id: i, data: chunk });
+      }
+    }
+
+    // 6. WORKER TERMINATION
+    const longTaskWorkerCode = `
+      self.onmessage = function(e) {
+        let count = 0;
+        const interval = setInterval(() => {
+          count++;
+          self.postMessage({ status: 'running', count });
+        }, 500);
+      };
+    `;
+
+    let longTaskWorker;
+
+    function startLongTask() {
+      const output = document.getElementById('lifecycle-output');
+      
+      if (longTaskWorker) longTaskWorker.terminate();
+      
+      const blob = new Blob([longTaskWorkerCode], { type: 'application/javascript' });
+      longTaskWorker = new Worker(URL.createObjectURL(blob));
+      
+      longTaskWorker.onmessage = function(e) {
+        output.innerHTML = `Worker running... count: ${e.data.count} <span class="status running">ACTIVE</span>`;
+      };
+      
+      longTaskWorker.postMessage('start');
+    }
+
+    function terminateWorkerDemo() {
+      const output = document.getElementById('lifecycle-output');
+      if (longTaskWorker) {
+        longTaskWorker.terminate();
+        longTaskWorker = null;
+        output.innerHTML = '❌ Worker terminated <span class="status">STOPPED</span>';
+      } else {
+        output.textContent = 'No worker running. Start a long task first.';
+      }
+    }
+
+    // 7. SHARED WORKER
+    const sharedWorkerCode = `
+      const connections = [];
+      
+      self.onconnect = function(e) {
+        const port = e.ports[0];
+        connections.push(port);
+        
+        port.onmessage = function(event) {
+          connections.forEach(conn => {
+            conn.postMessage('Broadcast: ' + event.data + ' (from tab)');
+          });
+        };
+        
+        port.postMessage('Connected to SharedWorker! Connected ports: ' + connections.length);
+        port.start();
+      };
+    `;
+
+    let sharedWorker;
+    let sharedPort;
+
+    function sharedWorkerDemo() {
+      const output = document.getElementById('shared-output');
+      
+      try {
+        const blob = new Blob([sharedWorkerCode], { type: 'application/javascript' });
+        sharedWorker = new SharedWorker(URL.createObjectURL(blob));
+        sharedPort = sharedWorker.port;
+        
+        sharedPort.onmessage = function(e) {
+          output.innerHTML += e.data + '<br>';
+        };
+        
+        sharedPort.start();
+      } catch (error) {
+        output.className = 'output error';
+        output.textContent = 'SharedWorker not supported or error: ' + error.message;
+      }
+    }
+
+    function sendToShared() {
+      if (sharedPort) {
+        sharedPort.postMessage('Hello at ' + new Date().toLocaleTimeString());
+      } else {
+        document.getElementById('shared-output').textContent = 'Connect to SharedWorker first!';
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Memoization in JavaScript</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+    }
+    .container {
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    }
+    h1 {
+      color: #667eea;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 30px;
+    }
+    .section {
+      background: #f8f9fa;
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 8px;
+      border-left: 4px solid #667eea;
+    }
+    h2 {
+      color: #333;
+      margin-top: 0;
+    }
+    .code-block {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 15px;
+      border-radius: 6px;
+      overflow-x: auto;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      margin: 10px 0;
+    }
+    .keyword { color: #569cd6; }
+    .function { color: #dcdcaa; }
+    .string { color: #ce9178; }
+    .comment { color: #6a9955; }
+    .number { color: #b5cea8; }
+    button {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      margin: 5px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+    button:hover {
+      background: #5568d3;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+    button:active {
+      transform: translateY(0);
+    }
+    .demo-box {
+      background: white;
+      border: 2px solid #e0e0e0;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 15px 0;
+    }
+    .result {
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 6px;
+      font-family: monospace;
+    }
+    .result.fast {
+      background: #d4edda;
+      border-left: 4px solid #28a745;
+    }
+    .result.slow {
+      background: #fff3cd;
+      border-left: 4px solid #ffc107;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin: 15px 0;
+    }
+    .stat-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+    }
+    .stat-number {
+      font-size: 28px;
+      font-weight: bold;
+      margin: 5px 0;
+    }
+    .stat-label {
+      font-size: 12px;
+      opacity: 0.9;
+    }
+    input[type="number"] {
+      padding: 10px;
+      border: 2px solid #e0e0e0;
+      border-radius: 6px;
+      font-size: 16px;
+      width: 100px;
+      margin: 5px;
+    }
+    .warning {
+      background: #fff3cd;
+      border-left: 4px solid #ffc107;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 4px;
+    }
+    .success {
+      background: #d4edda;
+      border-left: 4px solid #28a745;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 4px;
+    }
+    .cache-display {
+      background: #f8f9fa;
+      padding: 10px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 12px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🧠 Memoization in JavaScript</h1>
+    <p class="subtitle">Cache function results to avoid expensive recalculations</p>
+
+    <!-- What is Memoization -->
+    <div class="section">
+      <h2>📖 What is Memoization?</h2>
+      <p><strong>Memoization</strong> is an optimization technique that stores the results of expensive function calls and returns the cached result when the same inputs occur again.</p>
+      <p><strong>Key Benefits:</strong></p>
+      <ul>
+        <li>Prevents redundant calculations</li>
+        <li>Improves performance for expensive operations</li>
+        <li>Trades memory for speed (space-time tradeoff)</li>
+      </ul>
+    </div>
+
+    <!-- Example 1: Basic Memoization -->
+    <div class="section">
+      <h2>1️⃣ Basic Memoization Implementation</h2>
+      
+      <div class="code-block">
+<span class="comment">// Simple memoization function</span>
+<span class="keyword">function</span> <span class="function">memoize</span>(fn) {
+  <span class="keyword">const</span> cache = {};
+  
+  <span class="keyword">return function</span>(...args) {
+    <span class="keyword">const</span> key = <span class="function">JSON.stringify</span>(args);
+    
+    <span class="keyword">if</span> (key <span class="keyword">in</span> cache) {
+      <span class="keyword">return</span> cache[key]; <span class="comment">// Return cached result</span>
+    }
+    
+    <span class="keyword">const</span> result = fn(...args);
+    cache[key] = result; <span class="comment">// Store in cache</span>
+    <span class="keyword">return</span> result;
+  };
+}
+      </div>
+
+      <div class="demo-box">
+        <p><strong>Try it: Square Function</strong></p>
+        <input type="number" id="square-input" value="5" min="1" max="1000">
+        <button onclick="testSquare(false)">Calculate (No Cache)</button>
+        <button onclick="testSquare(true)">Calculate (Memoized)</button>
+        <div id="square-result" class="result"></div>
+        <div id="square-cache" class="cache-display"></div>
+      </div>
+    </div>
+
+    <!-- Example 2: Fibonacci -->
+    <div class="section">
+      <h2>2️⃣ Classic Example: Fibonacci Numbers</h2>
+      
+      <div class="code-block">
+<span class="comment">// Without memoization - exponential time O(2^n)</span>
+<span class="keyword">function</span> <span class="function">fibonacci</span>(n) {
+  <span class="keyword">if</span> (n <= <span class="number">1</span>) <span class="keyword">return</span> n;
+  <span class="keyword">return</span> fibonacci(n - <span class="number">1</span>) + fibonacci(n - <span class="number">2</span>);
+}
+
+<span class="comment">// With memoization - linear time O(n)</span>
+<span class="keyword">const</span> fibMemo = <span class="function">memoize</span>(fibonacci);
+      </div>
+
+      <div class="demo-box">
+        <p><strong>Compare Performance:</strong></p>
+        <input type="number" id="fib-input" value="35" min="1" max="45">
+        <button onclick="testFibonacci(false)">Without Memoization</button>
+        <button onclick="testFibonacci(true)">With Memoization</button>
+        <div class="warning">⚠️ Values above 40 may freeze without memoization!</div>
+        <div id="fib-result"></div>
+        <div class="stats" id="fib-stats"></div>
+      </div>
+    </div>
+
+    <!-- Example 3: API Call Memoization -->
+    <div class="section">
+      <h2>3️⃣ Memoizing Async Functions (API Calls)</h2>
+      
+      <div class="code-block">
+<span class="comment">// Memoize async functions</span>
+<span class="keyword">function</span> <span class="function">memoizeAsync</span>(fn) {
+  <span class="keyword">const</span> cache = {};
+  
+  <span class="keyword">return async function</span>(...args) {
+    <span class="keyword">const</span> key = <span class="function">JSON.stringify</span>(args);
+    
+    <span class="keyword">if</span> (key <span class="keyword">in</span> cache) {
+      <span class="keyword">return</span> cache[key];
+    }
+    
+    <span class="keyword">const</span> result = <span class="keyword">await</span> fn(...args);
+    cache[key] = result;
+    <span class="keyword">return</span> result;
+  };
+}
+      </div>
+
+      <div class="demo-box">
+        <p><strong>Simulate API Call:</strong></p>
+        <input type="number" id="user-id" value="1" min="1" max="10">
+        <button onclick="fetchUser(false)">Fetch User (No Cache)</button>
+        <button onclick="fetchUser(true)">Fetch User (Memoized)</button>
+        <div id="api-result"></div>
+        <div id="api-stats"></div>
+      </div>
+    </div>
+
+    <!-- Example 4: Advanced with TTL -->
+    <div class="section">
+      <h2>4️⃣ Advanced: Memoization with TTL (Time To Live)</h2>
+      
+      <div class="code-block">
+<span class="comment">// Memoization with expiration time</span>
+<span class="keyword">function</span> <span class="function">memoizeWithTTL</span>(fn, ttl = <span class="number">5000</span>) {
+  <span class="keyword">const</span> cache = {};
+  
+  <span class="keyword">return function</span>(...args) {
+    <span class="keyword">const</span> key = <span class="function">JSON.stringify</span>(args);
+    <span class="keyword">const</span> now = <span class="function">Date.now</span>();
+    
+    <span class="keyword">if</span> (cache[key] && now - cache[key].timestamp < ttl) {
+      <span class="keyword">return</span> cache[key].value;
+    }
+    
+    <span class="keyword">const</span> result = fn(...args);
+    cache[key] = { value: result, timestamp: now };
+    <span class="keyword">return</span> result;
+  };
+}
+      </div>
+
+      <div class="demo-box">
+        <p><strong>Cache expires after 3 seconds:</strong></p>
+        <button onclick="testTTL()">Get Timestamp</button>
+        <div id="ttl-result"></div>
+        <p class="success" style="font-size: 12px;">Click multiple times within 3 seconds to see cached value, then wait 3+ seconds to see new value</p>
+      </div>
+    </div>
+
+    <!-- Example 5: LRU Cache -->
+    <div class="section">
+      <h2>5️⃣ LRU Cache (Least Recently Used)</h2>
+      
+      <div class="code-block">
+<span class="comment">// LRU Cache with max size</span>
+<span class="keyword">function</span> <span class="function">memoizeWithLRU</span>(fn, maxSize = <span class="number">3</span>) {
+  <span class="keyword">const</span> cache = <span class="keyword">new</span> Map();
+  
+  <span class="keyword">return function</span>(...args) {
+    <span class="keyword">const</span> key = <span class="function">JSON.stringify</span>(args);
+    
+    <span class="keyword">if</span> (cache.has(key)) {
+      <span class="keyword">const</span> value = cache.get(key);
+      cache.delete(key);
+      cache.set(key, value); <span class="comment">// Move to end (most recent)</span>
+      <span class="keyword">return</span> value;
+    }
+    
+    <span class="keyword">const</span> result = fn(...args);
+    cache.set(key, result);
+    
+    <span class="keyword">if</span> (cache.size > maxSize) {
+      <span class="keyword">const</span> firstKey = cache.keys().next().value;
+      cache.delete(firstKey); <span class="comment">// Remove oldest</span>
+    }
+    
+    <span class="keyword">return</span> result;
+  };
+}
+      </div>
+
+      <div class="demo-box">
+        <p><strong>LRU Cache (max 3 items):</strong></p>
+        <input type="number" id="lru-input" value="1" min="1" max="10">
+        <button onclick="testLRU()">Calculate</button>
+        <div id="lru-result"></div>
+        <div id="lru-cache" class="cache-display"></div>
+        <p style="font-size: 12px; color: #666;">Try numbers 1-5. After 3 different numbers, oldest will be evicted.</p>
+      </div>
+    </div>
+
+    <!-- React Comparison -->
+    <div class="section">
+      <h2>⚛️ Memoization in React</h2>
+      <div class="code-block">
+<span class="comment">// React.memo - memoizes component</span>
+<span class="keyword">const</span> ExpensiveComponent = React.memo(<span class="keyword">function</span>({ data }) {
+  <span class="keyword">return</span> &lt;div&gt;{heavyCalculation(data)}&lt;/div&gt;;
+});
+
+<span class="comment">// useMemo - memoizes values</span>
+<span class="keyword">const</span> memoizedValue = useMemo(() => {
+  <span class="keyword">return</span> expensiveCalculation(a, b);
+}, [a, b]);
+
+<span class="comment">// useCallback - memoizes functions</span>
+<span class="keyword">const</span> memoizedCallback = useCallback(() => {
+  doSomething(a, b);
+}, [a, b]);
+      </div>
+    </div>
+
+    <!-- When to Use -->
+    <div class="section">
+      <h2>✅ When to Use Memoization</h2>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div>
+          <h3 style="color: #28a745;">✅ Good Use Cases:</h3>
+          <ul>
+            <li>Expensive calculations (recursion, math)</li>
+            <li>Repeated API calls with same params</li>
+            <li>Pure functions (same input → same output)</li>
+            <li>Data transformations</li>
+            <li>Search/filter operations</li>
+          </ul>
+        </div>
+        <div>
+          <h3 style="color: #dc3545;">❌ Avoid When:</h3>
+          <ul>
+            <li>Functions are already fast</li>
+            <li>Results are rarely reused</li>
+            <li>Memory is constrained</li>
+            <li>Functions have side effects</li>
+            <li>Inputs change frequently</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Global cache objects for demos
+    let squareCache = {};
+    let apiCallCount = { normal: 0, memoized: 0 };
+    let apiCache = {};
+    let lruCache = new Map();
+    const LRU_MAX_SIZE = 3;
+
+    // 1. Basic Memoization
+    function memoize(fn) {
+      const cache = {};
+      return function(...args) {
+        const key = JSON.stringify(args);
+        if (key in cache) {
+          return { result: cache[key], cached: true };
+        }
+        const result = fn(...args);
+        cache[key] = result;
+        return { result, cached: false };
+      };
+    }
+
+    function square(n) {
+      // Simulate expensive operation
+      let sum = 0;
+      for (let i = 0; i < 1000000; i++) {
+        sum += i;
+      }
+      return n * n;
+    }
+
+    const memoizedSquare = memoize(square);
+
+    function testSquare(useMemo) {
+      const input = parseInt(document.getElementById('square-input').value);
+      const start = performance.now();
+      
+      let result, cached;
+      if (useMemo) {
+        const data = memoizedSquare(input);
+        result = data.result;
+        cached = data.cached;
+      } else {
+        result = square(input);
+        cached = false;
+      }
+      
+      const time = (performance.now() - start).toFixed(2);
+      
+      const resultDiv = document.getElementById('square-result');
+      resultDiv.className = cached ? 'result fast' : 'result slow';
+      resultDiv.innerHTML = `
+        <strong>Result:</strong> ${input}² = ${result}<br>
+        <strong>Time:</strong> ${time}ms<br>
+        <strong>Status:</strong> ${cached ? '✅ From Cache!' : '⏳ Calculated'}
+      `;
+
+      // Update cache display
+      if (useMemo) {
+        const cacheDiv = document.getElementById('square-cache');
+        cacheDiv.innerHTML = '<strong>Cache Contents:</strong><br>' + 
+          Object.entries(memoizedSquare).map(([k, v]) => `${k}: ${v}`).join('<br>');
+      }
+    }
+
+    // 2. Fibonacci
+    function fibonacci(n) {
+      if (n <= 1) return n;
+      return fibonacci(n - 1) + fibonacci(n - 2);
+    }
+
+    const memoizedFib = (function() {
+      const cache = {};
+      return function fib(n) {
+        if (n in cache) return cache[n];
+        if (n <= 1) return n;
+        cache[n] = fib(n - 1) + fib(n - 2);
+        return cache[n];
+      };
+    })();
+
+    function testFibonacci(useMemo) {
+      const n = parseInt(document.getElementById('fib-input').value);
+      const resultDiv = document.getElementById('fib-result');
+      const statsDiv = document.getElementById('fib-stats');
+      
+      resultDiv.innerHTML = '<p>Calculating...</p>';
+      statsDiv.innerHTML = '';
+      
+      setTimeout(() => {
+        const start = performance.now();
+        const result = useMemo ? memoizedFib(n) : fibonacci(n);
+        const time = (performance.now() - start).toFixed(2);
+        
+        resultDiv.className = useMemo ? 'result fast' : 'result slow';
+        resultDiv.innerHTML = `
+          <strong>Fibonacci(${n}) = ${result}</strong><br>
+          Method: ${useMemo ? 'Memoized' : 'Regular Recursion'}
+        `;
+        
+        statsDiv.innerHTML = `
+          <div class="stat-card">
+            <div class="stat-label">Computation Time</div>
+            <div class="stat-number">${time}ms</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Performance</div>
+            <div class="stat-number">${useMemo ? '⚡ Fast' : '🐌 Slow'}</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Algorithm</div>
+            <div class="stat-number">${useMemo ? 'O(n)' : 'O(2ⁿ)'}</div>
+          </div>
+        `;
+      }, 10);
+    }
+
+    // 3. API Call Memoization
+    async function simulateAPICall(userId) {
+      return new Promise(resolve => {
+        setTimeout(() => {
+          resolve({
+            id: userId,
+            name: `User ${userId}`,
+            email: `user${userId}@example.com`,
+            timestamp: new Date().toLocaleTimeString()
+          });
+        }, 1000);
+      });
+    }
+
+    async function fetchUser(useMemo) {
+      const userId = parseInt(document.getElementById('user-id').value);
+      const resultDiv = document.getElementById('api-result');
+      const statsDiv = document.getElementById('api-stats');
+      
+      const cacheKey = `user-${userId}`;
+      const start = performance.now();
+      
+      let user, cached = false;
+      
+      if (useMemo && apiCache[cacheKey]) {
+        user = apiCache[cacheKey];
+        cached = true;
+        apiCallCount.memoized++;
+      } else {
+        resultDiv.innerHTML = '<p>Fetching from API...</p>';
+        user = await simulateAPICall(userId);
+        if (useMemo) {
+          apiCache[cacheKey] = user;
+        }
+        if (useMemo) {
+          apiCallCount.memoized++;
+        } else {
+          apiCallCount.normal++;
+        }
+      }
+      
+      const time = (performance.now() - start).toFixed(2);
+      
+      resultDiv.className = cached ? 'result fast' : 'result slow';
+      resultDiv.innerHTML = `
+        <strong>User Data:</strong><br>
+        ID: ${user.id}<br>
+        Name: ${user.name}<br>
+        Email: ${user.email}<br>
+        Fetched: ${user.timestamp}<br>
+        <strong>Time:</strong> ${time}ms<br>
+        <strong>Status:</strong> ${cached ? '✅ From Cache' : '🌐 API Call'}
+      `;
+      
+      statsDiv.innerHTML = `
+        <div class="stats">
+          <div class="stat-card">
+            <div class="stat-label">Normal API Calls</div>
+            <div class="stat-number">${apiCallCount.normal}</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Memoized Calls</div>
+            <div class="stat-number">${apiCallCount.memoized}</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Cache Hits</div>
+            <div class="stat-number">${Object.keys(apiCache).length}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    // 4. TTL Memoization
+    const ttlCache = {};
+    const TTL = 3000; // 3 seconds
+
+    function getTimestamp() {
+      return new Date().toLocaleTimeString();
+    }
+
+    function testTTL() {
+      const key = 'timestamp';
+      const now = Date.now();
+      
+      if (ttlCache[key] && now - ttlCache[key].timestamp < TTL) {
+        const age = ((now - ttlCache[key].timestamp) / 1000).toFixed(1);
+        document.getElementById('ttl-result').className = 'result fast';
+        document.getElementById('ttl-result').innerHTML = `
+          <strong>Cached Value:</strong> ${ttlCache[key].value}<br>
+          <strong>Cache Age:</strong> ${age}s (expires at 3s)<br>
+          <strong>Status:</strong> ✅ Using cached value
+        `;
+      } else {
+        const newValue = getTimestamp();
+        ttlCache[key] = { value: newValue, timestamp: now };
+        document.getElementById('ttl-result').className = 'result slow';
+        document.getElementById('ttl-result').innerHTML = `
+          <strong>New Value:</strong> ${newValue}<br>
+          <strong>Status:</strong> 🔄 Cache expired, fetched new value
+        `;
+      }
+    }
+
+    // 5. LRU Cache
+    function expensiveCalc(n) {
+      return n * n * Math.sqrt(n);
+    }
+
+    function testLRU() {
+      const input = parseInt(document.getElementById('lru-input').value);
+      const key = input.toString();
+      
+      let result, cached = false;
+      
+      if (lruCache.has(key)) {
+        result = lruCache.get(key);
+        lruCache.delete(key);
+        lruCache.set(key, result); // Move to end
+        cached = true;
+      } else {
+        result = expensiveCalc(input);
+        lruCache.set(key, result);
+        
+        if (lruCache.size > LRU_MAX_SIZE) {
+          const firstKey = lruCache.keys().next().value;
+          lruCache.delete(firstKey);
+        }
+      }
+      
+      document.getElementById('lru-result').className = cached ? 'result fast' : 'result slow';
+      document.getElementById('lru-result').innerHTML = `
+        <strong>Input:</strong> ${input}<br>
+        <strong>Result:</strong> ${result.toFixed(2)}<br>
+        <strong>Status:</strong> ${cached ? '✅ Cache Hit' : '🔄 Calculated & Cached'}
+      `;
+      
+      const cacheArray = Array.from(lruCache.entries());
+      document.getElementById('lru-cache').innerHTML = 
+        '<strong>LRU Cache (max 3, ordered by recency):</strong><br>' +
+        cacheArray.map(([k, v], i) => 
+          `${i + 1}. Input ${k} = ${v.toFixed(2)} ${i === cacheArray.length - 1 ? '← Most Recent' : ''}`
+        ).join('<br>') +
+        (cacheArray.length === 0 ? 'Empty' : '');
+    }
+  </script>
+</body>
+</html>

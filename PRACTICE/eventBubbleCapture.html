@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Event Bubbling and Capturing</title>
+  <style>
+    #parent {
+      padding: 40px;
+      background: lightblue;
+    }
+
+    #child {
+      padding: 30px;
+      background: lightcoral;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="parent">
+    Parent
+    <div id="child">
+      Child - Click me
+    </div>
+  </div>
+  
+	<ul id="list">
+	  <li class="item">Apple</li>
+	  <li class="item">Banana</li>
+	  <li class="item">Orange</li>
+	</ul>
+	
+	<ul id="menu">
+	  <li>Home</li>
+	  <li>About</li>
+	  <li>Contact</li>
+	</ul>
+
+  <script>
+	//bubble vs capture
+    document.getElementById("parent").addEventListener("click", () => {
+      console.log("parent bubble");
+    });
+
+    document.getElementById("child").addEventListener("click", () => {
+      console.log("child bubble");
+    });
+
+    document.getElementById("parent").addEventListener("click", () => {
+      console.log("parent capture");
+    }, true);
+
+    document.getElementById("child").addEventListener("click", () => {
+      console.log("child capture");
+    }, true);
+	
+	//without Event delegation
+	document.querySelectorAll(".item").forEach(item=> {
+	  item.addEventListener("click", () => {
+		console.log("clicked")
+	  });
+	});
+
+	//With delegation
+	document.getElementById("list").addEventListener("click", (e) => {
+	  if (e.target.classList.contains("item")) {
+		console.log("Item clicked:", e.target.textContent);
+	  }
+	});
+	
+	  const menu = document.getElementById("menu");
+
+	  menu.addEventListener("click", function (event) {
+		if (event.target.tagName === "LI") {
+		  console.log("You clicked:", event.target.textContent);
+		}
+	  });
+  </script>
+
+</body>
+</html>

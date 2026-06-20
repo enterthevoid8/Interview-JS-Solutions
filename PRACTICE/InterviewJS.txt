@@ -1,0 +1,124 @@
+🔥 Core Fundamentals
+	Object creation methods + best practices
+	Prototype chain + __proto__ vs prototype
+	this keyword
+	call / apply / bind
+	Closures (VERY IMPORTANT)
+	Hoisting
+	Scope (global / block / lexical)
+	let / const / var + TDZ
+	Execution context (global + function)
+	
+⚡ Async + Event Loop (🔥 MOST IMPORTANT)
+	Event loop
+	Call stack / Event queue / Microtask queue
+	Promises (states, chaining, all, race)
+	Async / await
+	Callbacks + callback hell
+	Microtask vs Macrotask
+	setTimeout vs setImmediate vs nextTick
+	Debouncing / Throttling
+	
+⚡ Functions (High weight)
+	First-class functions
+	Higher-order functions
+	Currying
+	Pure vs impure functions
+	Arrow vs normal functions (this)
+	IIFE
+	
+⚡ Equality & Types
+	== vs ===
+	null vs undefined
+	primitive vs non-primitive
+	typeof / NaN / isNaN
+	
+⚡ Arrays & Objects
+	map / filter / reduce
+	slice vs splice
+	shallow vs deep copy
+	destructuring
+	spread vs rest
+	
+🥈 TIER 2 — VERY IMPORTANT (Asked frequently)
+
+(Next 20–25% interviews)
+
+⚡ Modern JS
+	ES6 features
+	Classes + inheritance (super)
+	Modules (why needed)
+	Template literals
+	Optional chaining / nullish coalescing
+	
+⚡ Browser + DOM
+	Event bubbling / capturing
+	Event delegation
+	preventDefault / stopPropagation
+	DOMContentLoaded vs load
+	
+⚡ Storage
+	localStorage vs sessionStorage vs cookies
+	IndexedDB (basic)
+	
+⚡ Advanced Concepts
+	Memoization
+	Polyfill vs shim
+	Proxy object
+	WeakMap vs Map
+	Object.freeze vs seal
+	
+⚡ Error Handling
+	try/catch/finally
+	Error object types
+	
+🥉 TIER 3 — GOOD TO KNOW (Mid-level interviews)
+
+(Asked occasionally)
+
+	Service workers
+	Web workers
+	postMessage
+	server-sent events
+	requestAnimationFrame
+	URL handling / query params
+	history API
+	
+⚡ Node.js / Runtime
+	Node.js architecture
+	Single-threaded concept
+	V8 engine basics
+	process.nextTick
+	
+⚡ Performance
+	Tree shaking
+	Minification vs obfuscation
+	Memory leaks
+	Reflow vs repaint
+	
+🧠 TIER 4 — ADVANCED / EDGE / RARE
+
+	(Only senior / deep JS roles)
+
+	Hidden classes
+	Inline caching
+	Execution phases deep dive
+	Generators / iterators
+	Proper tail calls
+	Decorators
+	Module loaders
+	Intl object
+	
+🧪 TIER 5 — CODING / PRACTICAL (VERY IMPORTANT FOR ROUNDS)
+
+👉 These are actually asked in coding rounds
+
+	Debounce implementation
+	Throttle implementation
+	Deep copy
+	Flatten array
+	Unique array values
+	Remove falsy values
+	Custom bind implementation
+	Promise polyfill basics
+	Event delegation implementation

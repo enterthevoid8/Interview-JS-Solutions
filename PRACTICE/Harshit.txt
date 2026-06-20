@@ -1,0 +1,94 @@
+Frontend Developer Skills:-
+:- HTML, CSS, JAVASCRIPT, TYPESCRIPT, REACT, NEXTJS, VUEJS, REDUX, CONTEXT, ZUSTAND
+:- Mirco Frontend, 
+:- Core Web Vitals
+:- Lazy loading / code splitting, Bundle optimization
+Backend Developer Skills:-
+:- NodeJS, Express/NestJS
+:- MongoDB/PostgresSQL
+:- REST
+:- GraphQL
+:- Message queues (RabbitMQ, Kafka, Redis Queues, SQS)
+:- API Development
+:- Caching (Redis), Queue systems
+
+System Design(LLD +HLD+API design+ Data modeling)
+Microservices+Service boundaries+Scalability basics
+AWS/Docker, CI/CD, Deployment
+Performance Optimization
+
+React (advanced)
+Next.js (SSR, RSC, routing)
+TypeScript (mandatory now)
+State management: Zustand / Redux Toolkit
+Styling: Tailwind / CSS Modules
+Performance: Memoization
+Code splitting
+Testing: Jest / React Testing Library
+
+
+Option A: Node.js stack
+Node.js + Express / NestJS
+REST + GraphQL APIs
+Authentication: JWT, OAuth
+Database: MongoDB / PostgreSQL
+Caching: Redis
+microservices
+
+
+Accenture Good Job Description:-
+- Design, build, and maintain scalable, secure, and highly available cloud infrastructure on platforms such as AWS, Azure, or Google Cloud.
+- Design, develop, and maintain scalable frontend and backend applications that automate and manage IaaS resources, such as compute, network, and storage.
+- Develop and manage full stack infrastructure Application including backend services (APIs, microservices) and API gateway for frontend and backend services.
+- Write efficient, maintainable code and manage integration between front-end interfaces and back-end infrastructure services.
+- Implement Infrastructure as Code (IaC) using tools like Terraform, CloudFormation, or Pulumi.
+- Automate deployment pipelines and manage CI/CD workflows using tools such as Jenkins, GitLab CI, or GitHub Actions.
+- Deploy and manage Platform-as-a-Service (PaaS) offerings.
+- Design, implement, and maintain database solutions, including relational databases (e.g., MySQL, PostgreSQL, SQL Server) and NoSQL databases (e.g., MongoDB, DynamoDB)
+- Monitor, troubleshoot, and optimize cloud infrastructure and application performance.
+- Collaborate with DevOps, security, and development teams to ensure seamless integration and delivery.
+- Manage containerization and orchestration using Docker and Kubernetes.
+- Ensure compliance with security best practices and organizational policies.
+- Continuously evaluate and implement new cloud technologies and tools to improve efficiency.
+- Provide technical guidance and support to team members and stakeholders.
+- Integrate and support AI-driven tools and frameworks, including Generative AI and Agentic AI technologies, within cloud infrastructure and applications.
+Required Skills:
+- Strong proficiency in cloud platforms - AWS, Azure, and Google Cloud.
+- Hands-on experience with Infrastructure as Code (IaC) tools like Terraform, CloudFormation, or Pulumi.
+- Good programming skills across both frontend (HTML, CSS, JavaScript, React/Angular) and backend (Python, Node.js, Java, etc.) stacks.
+- Expertise in containerization and orchestration (Docker, Kubernetes).
+- Experience with Platform-as-a-Service (PaaS) offerings like AWS Elastic Beanstalk, Azure App Services, or Google App Engine.
+- Strong database skills with experience designing and managing relational (MySQL, PostgreSQL, SQL Server) and NoSQL (MongoDB, DynamoDB) databases.
+- Familiarity with CI/CD pipelines and automation tools (Jenkins, GitLab CI, GitHub Actions, & Ansible).
+- Strong understanding of networking, security, and cloud architecture best practices.
+- Ability to troubleshoot complex infrastructure and application issues.
+- Excellent communication and collaboration skills.
+- Experience with monitoring tools such as Prometheus, Grafana, ELK stack, or Cloud-native monitoring solutions.
+- Knowledge and hands-on experience with Generative AI (e.g., large language models, text/image generation) and Agentic AI frameworks
+- Proficiency with JIRA for issue tracking and project management.
+- Experience working in Agile environments using Kanban methodologies
+Certifications (Required / Preferred):
+- AWS Certified Solutions Architect Professional
+- Microsoft Certified: Azure Solutions Architect Expert
+- Google Professional Cloud Architect
+- Certified Kubernetes Administrator (CKA)
+- HashiCorp Certified: Terraform Associate
+- Certified DevOps Engineer certifications (AWS, Azure, or Go
+
+IGT Job Description:-
+
+Technology Stack experience:
+
+
+Frontend: SingleSPA, React.js 16+, Angular, HTML5, CSS3, JavaScript, Express.js
+Backend: Node.js, Spring Boot 2.X, Java 17+
+Mobile: React Native, Android Native
+Servers: Nginx, Apache Tomcat,
+Database: Oracle, MySQL, MongoDB, Redis, MariaDB, Couchbase
+Messaging Systems: Solace, Kafka
+API Development: RESTful, PostMan, OpenAPIv3
+Cloud Platforms: AWS, Microsoft Azure
+Linux Environments: Ubuntu, RedHat - OpenShift
+Version Control: Git, GitHub, GitLab
+Collaboration: Jira, Confluence, Miro, Mural
+CI/CD: Jenkins, Terraform

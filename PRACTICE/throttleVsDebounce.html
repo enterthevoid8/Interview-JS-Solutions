@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simple Debounce & Throttle</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .card {
+      background: white;
+      padding: 25px;
+      margin: 20px 0;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #333;
+      text-align: center;
+    }
+    h2 {
+      color: #555;
+      border-bottom: 2px solid #4CAF50;
+      padding-bottom: 8px;
+    }
+    .code {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 15px;
+      border-radius: 5px;
+      overflow-x: auto;
+      font-family: monospace;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .demo-box {
+      background: #f9f9f9;
+      padding: 20px;
+      border-radius: 5px;
+      border: 2px solid #ddd;
+      margin: 15px 0;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      border: 2px solid #ddd;
+      border-radius: 5px;
+      box-sizing: border-box;
+    }
+    button {
+      background: #4CAF50;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 5px;
+    }
+    button:hover {
+      background: #45a049;
+    }
+    .counter {
+      background: #4CAF50;
+      color: white;
+      padding: 15px;
+      border-radius: 5px;
+      text-align: center;
+      margin: 10px 0;
+      font-size: 20px;
+      font-weight: bold;
+    }
+    .highlight {
+      background: #fff3cd;
+      padding: 10px;
+      border-left: 4px solid #ffc107;
+      margin: 10px 0;
+    }
+    .keyword { color: #569cd6; }
+    .comment { color: #6a9955; }
+    .string { color: #ce9178; }
+    .number { color: #b5cea8; }
+  </style>
+</head>
+<body>
+  <h1>⚡ Simple Debounce & Throttle</h1>
+
+  <!-- DEBOUNCE -->
+  <div class="card">
+    <h2>1. Debounce - "Wait until they're done"</h2>
+    
+    <div class="code">
+<span class="comment">// DEBOUNCE: Waits for pause before executing</span>
+<span class="keyword">function</span> debounce(func, delay) {
+  <span class="keyword">let</span> timer;
+  <span class="keyword">return function</span>(...args) {
+    clearTimeout(timer);
+    timer = setTimeout(() => func(...args), delay);
+  };
+}
+    </div>
+
+    <div class="highlight">
+      <strong>📌 Key Idea:</strong> Resets the timer every time the function is called. Only executes after the specified delay with no new calls.
+    </div>
+
+    <div class="demo-box">
+      <h3>Demo: Search Box</h3>
+      <p>Type something - API call happens 1 second after you stop typing</p>
+      <input type="text" id="search" placeholder="Type here...">
+      <div class="counter" id="search-count">API Calls: 0</div>
+      <p style="font-size: 14px; color: #666;">
+        Without debounce, typing "hello" would make 5 API calls!<br>
+        With debounce, it only makes 1 call after you finish.
+      </p>
+    </div>
+  </div>
+
+  <!-- THROTTLE -->
+  <div class="card">
+    <h2>2. Throttle - "Maximum once per X seconds"</h2>
+    
+    <div class="code">
+<span class="comment">// THROTTLE: Limits execution to once per time period</span>
+<span class="keyword">function</span> throttle(func, delay) {
+  <span class="keyword">let</span> lastCall = <span class="number">0</span>;
+  <span class="keyword">return function</span>(...args) {
+    <span class="keyword">const</span> now = Date.now();
+    <span class="keyword">if</span> (now - lastCall < delay) <span class="keyword">return</span>;
+    lastCall = now;
+    func(...args);
+  };
+}
+    </div>
+
+    <div class="highlight">
+      <strong>📌 Key Idea:</strong> Executes immediately, then ignores calls until the delay period passes. Guarantees maximum execution rate.
+    </div>
+
+    <div class="demo-box">
+      <h3>Demo: Button Click</h3>
+      <p>Click the button as fast as you can - it only fires once per second</p>
+      <button onclick="handleThrottleClick()">Click Me Rapidly!</button>
+      <div class="counter" id="throttle-count">Executions: 0</div>
+      <p style="font-size: 14px; color: #666;">
+        Prevents spam clicking! Perfect for preventing double-submissions.
+      </p>
+    </div>
+  </div>
+
+  <!-- SIDE BY SIDE COMPARISON -->
+  <div class="card">
+    <h2>3. Side-by-Side Comparison</h2>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+      <div>
+        <h3>🟢 Debounce</h3>
+        <div class="demo-box" style="min-height: 200px;">
+          <button onclick="triggerDebounce()">Trigger Event</button>
+          <div class="counter" id="debounce-count">Count: 0</div>
+          <p style="font-size: 12px;">Click multiple times quickly. Function only runs 1 second after your last click.</p>
+        </div>
+      </div>
+      
+      <div>
+        <h3>🔵 Throttle</h3>
+        <div class="demo-box" style="min-height: 200px;">
+          <button onclick="triggerThrottle()">Trigger Event</button>
+          <div class="counter" id="throttle-compare-count">Count: 0</div>
+          <p style="font-size: 12px;">Click multiple times quickly. Function runs maximum once per second.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REAL WORLD EXAMPLES -->
+  <div class="card">
+    <h2>4. When to Use Each</h2>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+      <div>
+        <h3 style="color: #4CAF50;">✅ Use Debounce</h3>
+        <ul>
+          <li>Search input</li>
+          <li>Auto-save text</li>
+          <li>Form validation</li>
+          <li>Window resize (final)</li>
+          <li>Autocomplete</li>
+        </ul>
+      </div>
+      
+      <div>
+        <h3 style="color: #2196F3;">✅ Use Throttle</h3>
+        <ul>
+          <li>Scroll events</li>
+          <li>Mouse movement</li>
+          <li>Button clicks</li>
+          <li>Window resize (during)</li>
+          <li>Game updates</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="highlight" style="margin-top: 20px;">
+      <strong>🎯 Simple Rule:</strong><br>
+      <strong>Debounce</strong> = Wait for user to finish<br>
+      <strong>Throttle</strong> = Limit how often something happens
+    </div>
+  </div>
+
+  <script>
+    // ===================
+    // IMPLEMENTATIONS
+    // ===================
+
+    function debounce(func, delay) {
+      let timer;
+      return function(...args) {
+        clearTimeout(timer);
+        timer = setTimeout(() => func(...args), delay);
+      };
+    }
+
+    function throttle(func, delay) {
+      let lastCall = 0;
+      return function(...args) {
+        const now = Date.now();
+        if (now - lastCall < delay) return;
+        lastCall = now;
+        func(...args);
+      };
+    }
+
+    // ===================
+    // DEMO 1: SEARCH
+    // ===================
+
+    let searchCount = 0;
+
+    function makeAPICall(query) {
+      searchCount++;
+      document.getElementById('search-count').textContent = `API Calls: ${searchCount}`;
+      console.log('API Call made for:', query);
+    }
+
+    const debouncedSearch = debounce(makeAPICall, 1000);
+
+    document.getElementById('search').addEventListener('input', (e) => {
+      debouncedSearch(e.target.value);
+    });
+
+    // ===================
+    // DEMO 2: BUTTON THROTTLE
+    // ===================
+
+    let throttleCount = 0;
+
+    function handleClick() {
+      throttleCount++;
+      document.getElementById('throttle-count').textContent = `Executions: ${throttleCount}`;
+      console.log('Button clicked!');
+    }
+
+    const throttledClick = throttle(handleClick, 1000);
+
+    function handleThrottleClick() {
+      throttledClick();
+    }
+
+    // ===================
+    // DEMO 3: COMPARISON
+    // ===================
+
+    let debounceCompareCount = 0;
+    let throttleCompareCount = 0;
+
+    const debouncedFunction = debounce(() => {
+      debounceCompareCount++;
+      document.getElementById('debounce-count').textContent = `Count: ${debounceCompareCount}`;
+    }, 1000);
+
+    const throttledFunction = throttle(() => {
+      throttleCompareCount++;
+      document.getElementById('throttle-compare-count').textContent = `Count: ${throttleCompareCount}`;
+    }, 1000);
+
+    function triggerDebounce() {
+      debouncedFunction();
+    }
+
+    function triggerThrottle() {
+      throttledFunction();
+    }
+  </script>
+</body>
+</html>

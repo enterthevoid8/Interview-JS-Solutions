@@ -1,0 +1,317 @@
+object creation methods | recommendations/best practice
+add KeyVal pair in JS - dot/square notation
+Object enumeration/loop | get keyVal pairs | .keys .entries .values | Object initializer
+constructor method | call parent constructor - super()
+
+arguments Object
+prototype chain | proto vs prototype
+call, apply, bind
+JSON & its properties | JSON arrays
+slice, splice
+object vs map
+==, ===
+lamba/arrow function
+first class function
+first order function
+higher order function
+unary function
+currying function
+pure function
+anonymous function
+async function
+let/const/var
+global/declared/undeclared var
+precedence order - local/global
+redeclare var in switch
+TDZ temporal dead zone
+IIFE
+encode/decode URL
+memoization
+hoisting
+ES6 classes
+closures
+modules - maintain/reuse/namespacing
+scoping
+service worker - manipulate DOM, reuse information across restarts
+indexedDB
+web storage - access
+post message
+cookie
+cookie/localstorage/sessionstorage
+storage even & its event handler
+web workers - check support/ conceptual example/restrictions
+promise - states/purpose/rules/chaining/all/race
+callback - callback-hell/callback in callback
+promises vs callbacks
+server-sent events - notifications/browser-support
+strict mode
+double exclamation
+delete operator
+typeof/undefined/null
+eval/uneval
+history
+capskeyon
+isNaN/NaN/isFinite
+event flow/capture/bubbling
+event delegation
+preventDefault/stopPropagation | return false use
+form validation/submit
+os/mobile details
+document load vs DOMContentLoaded events
+native/host/user objects diff
+debugger tools - devtools/debugger-stmt/console.log
+attribute vs property
+same origin policy
+void 0
+JS compiled/interpreted
+case sensitivety
+Java Vs JS
+JS origins/founder
+DOM vs BOM vs JS Object
+setTimeout/setInterval/setImmediate/nextTick + clearTimeout etc.
+why single threaded
+ECMAScript
+PWA - progressive web apps
+redirect page
+URL properties
+get Query Strings
+check if a key exists in object | test empty object
+pros & cons for loop
+trimString
+!-- operator
+assign default values to variables
+multiline strings
+app shell model
+function properties
+number of functional parameters
+polyfill
+if/else/switch/continue/break
+JS labels
+why declarations on top
+initialization var benefits
+tree shaking
+regular expression - i/g/m | string methods support - search/replace/replaceAll/match/matchAll/split | RegExp obj
+exec method
+debugger statement | breakpoints
+reserved words as identifiers
+synchronous/asynchronous HTTP request
+conditional operator | chaining
+freeze vs seal obj | determine frozen/seal
+operators - arithmetic/comparison/logical/assignment/ternary/typeof
+spread vs rest params | last argm
+bitwise
+proxy obj
+WeakSet vs Set
+WeakMap vs Map
+JS accessors - get/set | advantages
+define property on Object constructor
+get vs defineProperty
+primitive data  - string/number/boolean/null/undefined/bigint/symbol
+way to access object properties - dot/square/expression
+function param rules
+error Object - names/types - stmts -> try/catch/throw/finally
+loop types - entry/exit controlled
+NodeJS/TypeScript | JS Vs. TS | MEAN | jQuery | Babel | RxJS | Deno | Bun
+Intl Object - date/time formatting | properties
+Iterator - synchronous
+event-loop/callstack/event-queue | tasks/microtask | purpose of queueMicrotask | event table
+decorator
+unary operator
+obfuscation / minification / encryption
+form / constraint validation
+validity property
+Enums in JS
+list all properties / descriptors of an Object
+attributes provided by property descriptors - value/writable/configurable/enumerable/get/set
+extend classes in JS
+modify URL without reloading page
+get values from searchParams
+JS namespaces - obj literal | IIFE | block or let/const
+methods to find HTML elements in DOM	getElementById/querySelector/querySelectorAll | TagName/ClassName
+V8 JS Engine
+for loop | let and var logging iterator
+ES6 features - constants/block-scope/arrow/default-params/rest-spread/template-object-literals/multi-line-strings/destructuring/promises/classes/modules
+const object/arrays - mutable but cannot reassign
+Types arrays
+module loaders adv. - dyanamic-loading/state-isolation/global-namespace-isolation/compilation-hooks/nested-virtualization
+for ..of vs ..in
+JS paradigm - multi-paradigm | imperative/procedural/object-oriented-programming(prototypal-inheritance)/functional-programming
+internal/external JS
+client/server side script | which is faster ?
+ArrayBuffer
+do all objects have prototypes ? - Object.prototype(base) & Object.create(null) doesn't
+shallow vs deep copy
+mixin example using object composition
+thunk / asynchronous thunks
+reflow vs. repaint
+ways to deal with asynchronous code - callbacks/promises/async-await/third-party-libs(async.js,bluebird)
+cancel a fetch request
+web speech API
+minimum timeout throttling
+implement zero timeout in modern browsers
+different event loops - browser/nodejs
+promises vs observables
+shim vs polyfill
+Function constructor vs function declaration
+short circuit condition - if(condition) {} | expression && someFunc();
+observable
+function vs class declaration - mainly hoisting
+make Object iterable in JS
+Proper Tail Call PTC
+different kinds of generators
+what are built-in iterables - arrays/typedArrays | strings/maps/sets/arguments/DOM collections - NodeList
+how to define instance & non-instance properties
+diff b/w isNaN vs Number.isNaN
+using expressions in switch case
+ignoring promises | null coalescing | optional chaining
+nesting/tabling/grouping console
+dense vs sparse arrays
+global vs functional execution context
+debouncing/throttling
+environment record
+pass by value vs reference
+primitives vs non-primitives
+pure vs impure functions
+referential transparency
+possible side-effects in JS
+compose and pipe functions
+module pattern
+function composition
+What is the purpose of the this keyword in JavaScript?
+What are the uses of closures? - data-privacy/function-factories/callback-functions/memoization/iterators-generators
+phases of execution context - creation/execution
+reasons for memory leaks
+optimization techniques of V8 engine - inline-expansion/copy-elision/inline-caching
+built-in higher order functions - arrays - map/filter/reduce/sort/forEach/some etc. | DOM - addEventListner etc. | Strings - replace etc.
+benefits of HOF -> abstraction/reusability/immutability/modularity
+polyfils for map/filter/reduce
+map vs forEach function
+statements affected by automatic semicolon insertion
+event phases of browser - capturing/target/bubbling
+real world use cases of proxy - vue3/solidjs/immerjs/zenstack  | reactive state/stores, track updates to immutable updates etc.
+hidden classes
+ways to execute external scripts - async/defer
+lexical scope | module scope
+requestAnimationFrame
+How to find the number of parameters expected by a function?
+globalThis
+array mutation methods - push/pop/unshift/shift/splice/sort/reverse/fill/copyWithin
+shadowing vs illegal shadowing
+why important to remove event listeners after use
+const vs object freeze
+
+
+LeetCode/common programming ques.
+
+string containing substring
+string starts with another string
+search string for pattern
+create specific number of copies of a string
+return all matching strings against a regular expression
+remove all line breaks from a string
+substring vs substr method
+trim a string at the beginning or ending
+What are the placeholders from console object
+output of below console statement with unary operator -> console.log(+"Hello"); // NaN
+What is the easiest way to convert an array to an object
+How do you create an array with some data - var newArray = new Array(5).fill("0"); | console.log(newArray); // ["0", "0", "0", "0", "0"]
+sort elements in array
+reverse an array with/without modifying original array
+compare scalar arrays
+some method in array usage/purpose
+combine two or more arrays
+What happens if we add two arrays
+compareFunction - sorting arrays
+verify is variable is an array
+How do you empty an array
+How do you remove falsy values from an array - const myArray = [false, null, 1, 5, undefined]; | myArray.filter(Boolean);
+How do you get unique values of an array - console.log([...new Set([1, 2, 4, 4, 3])]); // [1, 2, 4, 3]
+How do you map the array values without using map method
+What is the easiest way to resize an array
+How do you create your own bind method using either call or apply method?
+How do you prevent promises swallowing errors
+Check object is promise or not
+How to use await outside of async function prior to ES2022?
+How to detect if a function is called as constructor
+What happens with negating an array - console.log(![]); // false
+check whether array contains particular value
+create custom HTML element
+find min/max values in array | with/without Math fn
+How do you round numbers to certain decimals -> let pie = 3.141592653; | pie = pie.toFixed(3); // 3.142
+print numbers with commas as thousand separator
+invoke an IIFE without any extra brackets
+invoke JS code in iframe from parent page
+getTimezoneOffset from Date object
+convert string to titleCase
+detect JS enabled/disabled
+currentDate in JS
+compare date Objects
+first letter upperCase
+email validation JS
+get currentURL
+generate random integers | within a range
+change style of HTML element
+result of 1+2+'3'
+detect mobile without RegExp
+image width/height | size of window using JS
+change date to another timezone
+execute JS after page load - window/document/body - onload
+semi colon important use case
+browser language preference
+determine two values same or not using object
+purpose of using object is method
+copy properties from one obj to another
+Obj assign - merge/clone objects
+create object with prototype
+print contents of webpage
+syntax error
+empty statement and purpose - array with zero values
+metadata of module
+comma operator
+how to get prototype of an Object
+what happens when passing string to getPrototype method - String.prototype
+how to setPrototype of one object to another
+check if object can be extended or not
+prevent extending object - Object.preventExtensions/seal/freeze
+define multiple properties in object
+load CSS/JS files dynamically
+JS why a dynamic language
+Set cursor to wait
+Create infinite loop
+default params
+template literals
+nesting/tagged templates
+raw strings
+default values in destructuring assignment
+swap variables using destructuring assignment
+what are enhanced object literals
+dynamic imports
+collation
+output of [..."John Resig"]
+PostMessage secure | problems with postmessage target origin as wildcard | Is postMessages synchronous
+avoid receiving postMessages from attackers | Can I avoid using postMessages completely
+how to get status of checkbox
+double tilde operator
+convert character to ASCII code - charCode / fromCharCode
+purpose of error object
+difference between parameter and argument
+Does javascript uses mixins
+arrow vs regular function and this scope example
+What is destructuring aliases - const obj = { x: 1 }; | const { x: otherName } = obj;
+Is it possible to add CSS to console messages
+What is the purpose of dir method of console object
+Is it possible to debug HTML elements in console
+How do you display data in a tabular format using console object - console.table()
+How do you verify that an argument is a Number or not
+How do you create copy to clipboard button
+What is the shortcut to get timestamp
+How do you flattening multi dimensional arrays
+easiest multi condition checking
+How do you capture browser back button
+How do you disable right click in the web page
+What are wrapper objects
+What is AJAX
+How do you use javascript libraries in typescript file
+How do you detect primitive or non primitive value type
+Is NodeJS single threaded
+detect system dark mode in JS
