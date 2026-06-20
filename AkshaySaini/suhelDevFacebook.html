@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+  <head lang="en">
+  <meta charset="UTF-8">
+  <script language="JavaScript">
+    function showInput() {
+        document.getElementById('display').innerHTML = "I "+document.getElementById("name").value+" aged about "+document.getElementById("age").value+" want to declare that, I accept the terms and condition.";
+      document.getElementById("oath").style.display="block";
+      document.getElementById("form").style.display="none";
+    }
+  </script>
+
+  </head>
+<body>
+
+  <form id="form">
+    <label><b>Name: </b></label>
+    <input type="text" name="message" id="name">
+    <label><b>Age: </b></label>
+    <input type="text" name="message" id="age">
+    <input type="submit" onclick="showInput();"><br/>
+  </form>
+  <div id="oath" style="display:none">
+    <label>Oath: </label>
+    <p><span id='display'></span></p>
+  </div>
+</body>
+</html>

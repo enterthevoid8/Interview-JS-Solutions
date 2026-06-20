@@ -1,0 +1,190 @@
+// ==============================
+// Collage Mixin
+// ==============================
+
+// $x-span: how many columns does the item span across?
+// $y-span: how many rows does the item span across?
+// $x-point: starting from 0, which column does your item's left edge fall into?
+// $y-point: starting from 0, which row does your item's top edge fall into?
+// $x-max: how many columns are in the collage?
+// $y-max: how many rows are in the collage? By default it will equal the amount of columns in the collage.
+@mixin collage($x-span, $y-span, $x-point, $y-point, $x-max, $y-max: $x-max) {
+  $y-point: $y-point - 1;
+  $x-point: $x-point - 1;
+  top: percentage($y-point / $y-max);  
+  left: percentage($x-point / $x-max);
+  height: percentage($y-span / $y-max);
+  width: percentage($x-span / $x-max);
+}
+
+// spans 1 column
+// spans 2 rows
+// left top point placed in column 1
+// left top point placed in row 1
+// placed in a grid with X columns
+// placed in a grid with Y rows
+// @include collage(1, 2, 1, 1, nth($dimensions, 1), nth($dimensions, 2));
+
+
+// ==============================
+// Collage Spotlight
+// ==============================
+
+// number of rows
+// number of columns
+$dimensions: 3, 3;
+
+.collage--spotlight {
+  // Some type of height is necessary for this implementation
+  height: 100vh;
+}
+
+  .spotlight__item {
+    position: absolute;
+    
+    &:nth-of-type(1) {
+      @include collage(1, 2, 1, 1, nth($dimensions, 1), nth($dimensions, 2));
+    }
+    
+    &:nth-of-type(2) {
+      @include collage(1, 1, 1, 3, nth($dimensions, 1), nth($dimensions, 2));
+    }
+    
+    &:nth-of-type(3) {
+      @include collage(2, 1, 2, 1, nth($dimensions, 1), nth($dimensions, 2));
+    }
+    
+    &:nth-of-type(4) {
+      @include collage(1, 2, 2, 2, nth($dimensions, 1), nth($dimensions, 2));
+    }
+    
+    &:nth-of-type(5) {
+      @include collage(1, 1, 3, 2, nth($dimensions, 1), nth($dimensions, 2));
+    }
+    
+    &:nth-of-type(6) {
+      @include collage(1, 1, 3, 3, nth($dimensions, 1), nth($dimensions, 2));
+    }
+    
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+// ==============================
+// Resets
+// ==============================
+
+*,
+*:before,
+*:after {
+  box-sizing: border-box;
+  position: relative;
+}
+
+*:before,
+*:after { 
+  pointer-events: none; 
+}
+
+
+// ==============================
+// Structure
+// ==============================
+
+html { 
+  height: 100%;
+  font-family: 'Roboto';
+}
+
+  body { 
+    font-size: 20vmin;
+    height: 100%;
+  }
+
+
+// ==============================
+// Collage Presetation
+// ==============================
+
+.collage--spotlight {
+  border-top: .125rem solid #fff;
+  border-left: .125rem solid #fff;
+}
+
+  $spotlight-colors: 
+    #317794, 
+    #5ec1c9, 
+    #db92ba, 
+    #521b48, 
+    #9e3550, 
+    #8676d1;  
+
+  //css-tricks.com/you-can-transition-z-index/
+  .spotlight__item {
+    cursor: pointer;
+    border-right: .125rem solid #fff;
+    border-bottom: .125rem solid #fff;
+    transition:
+      top .5s,
+      left .5s,
+      z-index .5s,
+      height .5s,
+      width .5s,
+      background .2s;
+    
+    // resets position, covers entire screen
+    &.item--active {
+      top: 0;
+      left: 0;
+      z-index: 20;
+      height: 100%;
+      width: 100%;
+    }
+    
+    // assigns each panel a background
+    @for $i from 1 through length($spotlight-colors) {
+      
+      &:nth-of-type(#{$i}) {
+        background: nth($spotlight-colors, $i);
+        
+        &:hover {
+          background: darken(nth($spotlight-colors, $i), 10%);
+        }
+        
+      }
+    
+    }    
+    
+    // assigns and styles the numbers
+    &:before {
+      position: absolute;
+      top: 50%;
+      width: 100%;
+      text-align: center;
+      transform: translate(0, -50%);
+      color: #fff;
+      
+      @for $i from 1 through 6 {
+
+        @at-root .spotlight__item:nth-child(#{$i}) {
+
+          &:before {
+            content: '#{$i}';
+          }
+
+        }
+        
+      }
+      
+    }
+    
+  }
